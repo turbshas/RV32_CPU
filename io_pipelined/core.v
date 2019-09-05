@@ -123,14 +123,31 @@ always @(posedge clock) begin
     end
 end
 
+/* Forwarding logic for rs1 and rs2 */
+reg[1:0] rs1_source, rs2_source;
+reg[31:0] rs1_forwarded, rs2_forwarded;
+always @(*) begin
+    if (rs1_source == 2'b10) begin
+        rs1_forwarded = X_M_exec_unit_out; /* Forward from the memory stage */
+    end else if (rs1_source == 2'b11) begin
+        rs1_forwarded = M_W_writeback_out; /* Forward from the writeback stage */
+    end else begin
+        rs1_forwarded = D_X_rs1;
+    end
+
+    if (rs2_source == 2'b10) begin
+        rs2_forwarded = X_M_exec_unit_out; /* Forward from the memory stage */
+    end else if (rs2_source == 2'b11) begin
+        rs2_forwarded = M_W_writeback_out; /* Forward from the writeback stage */
+    end else begin
+        rs2_forwarded = D_X_rs2;
+    end
+end
+
 /* Execute stage */
-reg branch_cmp_eq, branch_cmp_lt;
-reg branch_cmp_unsigned;
+reg branch_cmp_eq, branch_cmp_lt, branch_cmp_unsigned;
 reg[3:0] exec_op;
-reg[1:0] operand1_sel;
-reg[1:0] operand2_sel;
-reg[1:0] b_operand1_sel;
-reg[1:0] b_operand2_sel;
+reg operand1_sel, operand2_sel;
 reg dmem_in_sel;
 decode_X decode_X_instr(
     /* Inputs */
@@ -141,10 +158,10 @@ decode_X decode_X_instr(
     .W_stage_instr(M_W_instr),
     /* Outputs */
     .exec_op(exec_op),
+    .rs1_source(rs1_source),
+    .rs2_source(rs2_source),
     .operand1_sel(operand1_sel),
     .operand2_sel(operand2_sel),
-    .b_operand1_sel(b_operand1_sel),
-    .b_operand2_sel(b_operand2_sel),
     .dmem_in_sel(dmem_in_sel),
     .pc_input_sel(pc_input_sel),
     .flush_F_D(flush_F_D),
@@ -153,12 +170,8 @@ decode_X decode_X_instr(
 
 branch_compare branch_compare_inst(
     /* Inputs */
-    .rs1(D_X_rs1),
-    .rs2(D_X_rs2),
-    .X_M_forward(X_M_exec_unit_out),
-    .M_W_forward(M_W_writeback_out),
-    .b_operand1_sel(b_operand1_sel),
-    .b_operand2_sel(b_operand2_sel),
+    .rs1(rs1_forwarded),
+    .rs2(rs2_forwarded),
     .unsigned_cmp(branch_cmp_unsigned),
     /* Outputs */
     .less_than(branch_cmp_lt),
@@ -170,11 +183,9 @@ assign new_PC_in = exec_unit_out;
 exec_unit exec_unit_inst(
     // inputs
     .pc(D_X_PC_out),
-    .rs1(D_X_rs1),
-    .rs2(D_X_rs2),
+    .rs1(rs1_forwarded),
+    .rs2(rs2_forwarded),
     .imm_val(D_X_imm),
-    .X_M_forward(X_M_exec_unit_out), // forward
-    .M_W_forward(M_W_writeback_out), // forward
     .operand1_sel(operand1_sel), //decode
     .operand2_sel(operand2_sel), //decode
     .exec_op(exec_op), //decode

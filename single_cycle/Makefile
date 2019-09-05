@@ -1,25 +1,23 @@
 FILE_LIST:=\
-	../PD1/mem.v \
-	../PD2/fetch/fetch.v \
-	../PD2/decode.v \
-	../PD2/imm_gen/imm_gen.v \
-	../PD3/reg_file/reg_file.v \
-	../PD3/branch_compare/branch_compare.v \
-	../PD3/exec_unit/exec_unit.v \
-	dmem/dmem.v \
-	write_back/write_back.v \
+	../components/mem/mem.v \
+	../components/fetch/fetch.v \
+	../components/decode/decode.v \
+	../components/imm_gen/imm_gen.v \
+	../components/reg_file/reg_file.v \
+	../components/branch_compare/branch_compare.v \
+	../components/exec_unit/exec_unit.v \
+	../components/write_back/write_back.v \
 	core.v
 
 INCLUDE_DIRS:=\
-	-I../PD1 \
-	-I../PD2 \
-	-I../PD2/fetch \
-	-I../PD2/imm_gen \
-	-I../PD3/reg_file \
-	-I../PD3/branch_compare \
-	-I../PD3/exec_unit \
-	-Idmem \
-	-Iwrite_back
+	-I. \
+	-I../components/mem \
+	-I../components/fetch \
+	-I../components/imm_gen \
+	-I../components/reg_file \
+	-I../components/branch_compare \
+	-I../components/exec_unit \
+	-I../components/write_back
 
 OUTPUT_NAME:=core
 TOPMODULE:=core

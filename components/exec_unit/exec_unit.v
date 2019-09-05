@@ -6,10 +6,8 @@ module exec_unit
     input wire [31:0] rs1,
     input wire [31:0] rs2,
     input wire [31:0] imm_val,
-    input wire [31:0] X_M_forward,
-    input wire [31:0] M_W_forward,
-    input wire [1:0] operand1_sel,
-    input wire [1:0] operand2_sel,
+    input wire operand1_sel,
+    input wire operand2_sel,
     input wire [3:0] exec_op,
     output reg [31:0] exec_out
 );
@@ -20,28 +18,20 @@ reg [31:0] operand2;
 // Assign operand 1
 always @(*) begin
   case (operand1_sel)
-      2'b00: // register
+      1'b0: // register
           operand1 = rs1;
-      2'b01: // pc
+      1'b1: // pc
           operand1 = pc;
-      2'b10: // X_M forward
-          operand1 = X_M_forward;
-      2'b11: // M_W forward
-          operand1 = M_W_forward;
   endcase
 end
 
 // assign operand 2
 always @(*) begin
   case(operand2_sel)
-      2'b00: // reg
+      1'b0: // reg
           operand2 = rs2;
-      2'b01: // immediate
+      1'b1: // immediate
           operand2 = imm_val;
-      2'b10: // X_M forward
-          operand2 = X_M_forward;
-      2'b11: // M_W forward
-          operand2 = M_W_forward;
   endcase
 end
 

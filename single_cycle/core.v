@@ -9,13 +9,14 @@ module core
 
 reg[31:0] PC_out;
 reg[31:0] imem_out;
-mem mem_inst(
+mem imem(
     .clock(clock),
     .address(PC_out),
     .data_in(),
     .data_out(imem_out),
     .read_write(1),
-    .enable(1)
+    .access_size(`ACCESS_SIZE_WORD),
+    .unsigned_access(1)
 );
 
 reg pc_input_sel;
@@ -27,6 +28,7 @@ fetch fetch_inst(
     .data_in(imem_out),
     .set_PC(pc_input_sel),
     .new_PC(new_PC_in),
+    .stall_PC(),
     .PC_out(PC_out),
     .instr(instr)
 );
@@ -90,7 +92,7 @@ reg[31:0] dmem_out;
 reg dmem_RW;
 reg[1:0] dmem_access_size;
 reg dmem_load_unsigned;
-dmem dmem_inst(
+mem dmem(
     .clock(clock),
     .address(exec_unit_out),
     .data_in(dmem_in),

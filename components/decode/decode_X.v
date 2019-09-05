@@ -6,11 +6,11 @@ module decode_X
     input wire[31:0] M_stage_instr,
     input wire[31:0] W_stage_instr,
     output reg[3:0] exec_op,
-    output reg[1:0] operand1_sel,
-    output reg[1:0] operand2_sel,
-    output reg[1:0] b_operand1_sel,
-    output reg[1:0] b_operand2_sel,
-    output reg dmem_in_sel ,
+    output reg[1:0] rs1_source,
+    output reg[1:0] rs2_source,
+    output reg operand1_sel,
+    output reg operand2_sel,
+    output reg dmem_in_sel,
     output reg pc_input_sel,
     output reg flush_F_D,
     output reg branch_cmp_unsigned
@@ -92,8 +92,8 @@ end
 // logic for determining where rs1 or rs2 come from,
 // bypass or reg file
 // if rs1 or rs2 is not used, that is handled by other parts
-reg [1:0] rs1_source;
-reg [1:0] rs2_source;
+//reg [1:0] rs1_source;
+//reg [1:0] rs2_source;
 reg [4:0] M_opcode, M_rd;
 reg [4:0] W_opcode, W_rd;
 reg M_no_rd, W_no_rd;
@@ -145,31 +145,25 @@ always @(*) begin
         // R-Type
         5'b01100:
         begin
-            operand1_sel = rs1_source; // reg
-            operand2_sel = rs2_source; // reg
+            operand1_sel = 0; // reg
+            operand2_sel = 0; // reg
         end
 
         // B-Type, J-Type, AUIPC
         5'b11000, 5'b11011 , 5'b00101 :
         begin
-            operand1_sel = 2'b01; // PC
-            operand2_sel = 2'b01; // imm
+            operand1_sel = 1; // PC
+            operand2_sel = 1; // imm
         end
 
         // I-Type, S-Type, JALR, LUI (make sure rs1 is set to x0)
         //5'b00100, 5'b01000, 5'11001, 5'b01101:
         default:
         begin
-            operand1_sel = rs1_source; // reg
-            operand2_sel = 2'b01; // imm
+            operand1_sel = 0; // reg
+            operand2_sel = 1; // imm
         end
     endcase
-end
-
-// Branch b_operand1_sel / b_operand2_sel
-always @(*) begin
-    b_operand1_sel = rs1_source;
-    b_operand2_sel = rs2_source;
 end
 
 // dmem_in_sel logic
