@@ -6,19 +6,12 @@ RAW=$(SOURCES:.c=.raw)
 BIN=$(SOURCES:.c=.bin)
 X=$(SOURCES:.c=.x)
 
-CC = mips-linux-gnu-gcc 
-OBJDUMP = mips-linux-gnu-objdump
-OBJCOPY = mips-linux-gnu-objcopy
-
-
-# 2016-05 version
-CC = /opt/riscv/bin/riscv32-unknown-elf-gcc
-OBJDUMP = /opt/riscv/bin/riscv32-unknown-elf-objdump 
-OBJCOPY = /opt/riscv/bin/riscv32-unknown-elf-objcopy
-# Old version of toolchain
+CC = riscv32-unknown-elf-gcc
+OBJDUMP = riscv32-unknown-elf-objdump 
+OBJCOPY = riscv32-unknown-elf-objcopy
 
 CFLAGS = -static -nostdlib -O0 -fno-delayed-branch -fomit-frame-pointer -nostartfiles #-Ttext=0x10000000
-CORE = -march=rv32i
+CORE = -march=rv32gc
 
 LINKERFILE= -T ece429.ld
 

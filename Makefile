@@ -50,7 +50,7 @@ sim_verilator: $(VTRACEFILE)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-#INSTR_TEST_FILES:=$(MKFILE_DIR)/benchmarks/individual-instructions/*.x
+#INSTR_TEST_FILES:=$(MKFILE_DIR)/benchmarks/individual_instructions/*.x
 #SIMPLE_PROGRAM_FILES:=$(MKFILE_DIR)/benchmarks/simple_programs/*.x
 #INSTR_TESTS:=$(foreach test, $(shell ls $(INSTR_TEST_FILES)), \
 	test_output/instr_$(basename $(notdir $(test))).out)
@@ -59,7 +59,7 @@ MKFILE_DIR := $(dir $(MKFILE_PATH))
 	test_output/program_$(basename $(notdir $(program))).out)
 
 instr_%.x:
-	@cp $(MKFILE_DIR)/benchmarks/individual-instructions/$(notdir $*).x ./$(notdir $@)
+	@cp $(MKFILE_DIR)/benchmarks/individual_instructions/$(notdir $*).x ./$(notdir $@)
 
 program_%.x:
 	@cp $(MKFILE_DIR)/benchmarks/simple_programs/$(notdir $*).x ./$(notdir $@)
