@@ -1,0 +1,28 @@
+- For taken branches and unconditional jumps, generate exception if target misaligned (do not do so on branch that isn't taken)
+- May want to have exception for load into x0
+- Support misaligned data memory access
+- Instructions:
+  - FENCE (device Input, device Output, memory Reads, memory Writes)
+    - Memory model: program-order for local hart, relaxed constraints across all harts - FENCE required to enforce ordering
+    - Sync data across all harts: no instruction after the fence can execute before an instruction preceding the fence
+    - rs1, rd, and immediate unused
+  - FENCE.I (sync instruction and data streams)
+    - This only tells the local core to read all of its own writes to instructions - i.e. flush cache and pipeline
+    - To sync across all harts, do a FENCE and then tell each core to do FENCE.I
+    - rs1, rd, and immediate unused
+  - CSR:
+    - If rd = x0, no read is performed and no side effects that would occur from a read
+    - If rs1 = x0, no write is performed and no side effects that would occur from a write (including illegal instruction exception on read-only CSR)
+    - Requires cycle-counting register, real-time-counting register, and instruction retired-counting register
+    - CSRRW
+    - CSRRS
+    - CSRRC
+    - CSRRWI
+    - CSRRSI
+    - CSRRCI
+  - ECALL
+    - Essentially, supervisor call
+    - rs1 is argument passed to system function
+    - rd is return value
+  - EBREAK
+
