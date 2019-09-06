@@ -1,10 +1,17 @@
-SOURCES= $(wildcard *.c)
-ELFS=$(SOURCES:.c=.elf)
-ASM=$(SOURCES:.c=.s)
-DMP=$(SOURCES:.c=.d)
-RAW=$(SOURCES:.c=.raw)
-BIN=$(SOURCES:.c=.bin)
-X=$(SOURCES:.c=.x)
+ASM_mi=$(wildcard rv32mi/*.S)
+ASM_si=$(wildcard rv32si/*.S)
+ASM_ua=$(wildcard rv32ua/*.S)
+ASM_uc=$(wildcard rv32uc/*.S)
+ASM_ud=$(wildcard rv32ud/*.S)
+ASM_uf=$(wildcard rv32uf/*.S)
+ASM_ui=$(wildcard rv32ui/*.S)
+ASM_um=$(wildcard rv32um/*.S)
+ASM=$(ASM_mi) $(ASM_si) $(ASM_ua) $(ASM_uc) $(ASM_ud) $(ASM_uf) $(ASM_ui) $(ASM_um)
+ELFS=$(ASM:.S=.elf)
+DMP=$(ASM:.S=.d)
+RAW=$(ASM:.S=.raw)
+BIN=$(ASM:.S=.bin)
+X=$(ASM:.S=.x)
 
 CC = riscv32-unknown-elf-gcc
 OBJDUMP = riscv32-unknown-elf-objdump 
@@ -15,15 +22,11 @@ CORE = -march=rv32gc
 
 LINKERFILE= -T ece429.ld
 
-all: $(ELFS) $(ASM) $(DMP) $(BIN) $(RAW) $(X)
+all: $(ELFS) $(DMP) $(BIN) $(RAW) $(X)
 
-%.elf: %.c
+%.elf: %.S
 	@echo "ELF-ing $^"
 	$(CC) $(CORE) $(CFLAGS) -o $@ $^ $(LINKERFILE)
-
-%.s: %.c
-	@echo "S-ing $^"
-	$(CC) $(CORE) $(CFLAGS) -S $^ $(LINKERFILE)
 
 %.d: %.elf
 	$(OBJDUMP) -D --disassembler-options=no-aliases,numeric $^ > $@
@@ -38,7 +41,7 @@ all: $(ELFS) $(ASM) $(DMP) $(BIN) $(RAW) $(X)
 	./mk-bin.py $^ > $@
 
 clean:
-	rm -f *.o core *.elf *.bin *.raw *.x  *.d *.s 
+	rm -f $(ELFS) $(DMP) $(RAW) $(BIN) $(X)
 
 rebuild: | clean all
 
