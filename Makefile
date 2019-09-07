@@ -18,7 +18,7 @@ sim: $(TRACEFILE)
 
 # Targets for building and simulating through verilator
 ifndef $(TEST_FILE)
-TEST_FILE:=SumArray.x
+TEST_FILE:=test.x
 endif
 TEST_LENGTH:=$(shell test -e $(TEST_FILE) && cat $(TEST_FILE) | wc -l)
 
@@ -50,12 +50,17 @@ sim_verilator: $(VTRACEFILE)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-INSTR_TEST_FILES:=$(wildcard $(MKFILE_DIR)/benchmarks/individual_instructions/*/*.x)
+INSTR_TEST_DIRS:=$(wildcard $(MKFILE_DIR)/benchmarks/individual_instructions/*)
+INSTR_TEST_FILES:=$(foreach d, $(INSTR_TEST_DIRS), $(wildcard $(d)/*.x))
 SIMPLE_PROGRAM_FILES:=$(wildcard $(MKFILE_DIR)/benchmarks/simple_programs/*.x)
-INSTR_TESTS:=$(foreach test, $(INSTR_TEST_FILES), \
+INSTR_TESTS:=$(INSTR_TEST_FILES:.x=.out)#$(foreach test, $(INSTR_TEST_FILES), \
 	test_output/instr_$(basename $(notdir $(test))).out)
-SIMPLE_PROGRAMS:=$(foreach program, $(SIMPLE_PROGRAM_FILES), \
+SIMPLE_PROGRAMS:=$(SIMPLE_PROGRAM_FILES:.x=.out)#$(foreach program, $(SIMPLE_PROGRAM_FILES), \
 	test_output/program_$(basename $(notdir $(program))).out)
+
+#$(warning $(INSTR_TEST_DIRS))
+#$(warning $(INSTR_TEST_FILES))
+#$(foreach d, $(INSTR_TEST_DIRS), $(warning $(d)/*.x))
 
 instr_%.x:
 	@cp $(MKFILE_DIR)/benchmarks/individual_instructions/$(notdir $*).x ./$(notdir $@)
@@ -63,10 +68,14 @@ instr_%.x:
 program_%.x:
 	@cp $(MKFILE_DIR)/benchmarks/simple_programs/$(notdir $*).x ./$(notdir $@)
 
-%.out: %.x
-	@make build_verilator TEST_FILE=$<
+%.out:
+	@cp $*.x tests/$(notdir $*.x)
+	@make build_verilator TEST_FILE=tests/$(notdir $*.x)
 	obj_dir/$(VERILATOR_NAME) > test_output/$(notdir $*).out
 	cp $(VTRACEFILE) vcd_output/$(notdir $*).vcd
+
+tests:
+	@mkdir tests
 
 test_output:
 	@mkdir test_output
@@ -74,11 +83,11 @@ test_output:
 vcd_output:
 	@mkdir vcd_output
 
-test: $(FILE_LIST) | test_output vcd_output $(INSTR_TESTS) $(SIMPLE_PROGRAMS)
+test: $(FILE_LIST) | tests test_output vcd_output $(INSTR_TESTS) $(SIMPLE_PROGRAMS)
 
-test_instr: $(FILE_LIST) | test_output vcd_output $(INSTR_TESTS)
+test_instr: $(FILE_LIST) | tests test_output vcd_output $(INSTR_TESTS)
 
-test_simple: $(FILE_LIST) | test_output vcd_output $(SIMPLE_PROGRAMS)
+test_simple: $(FILE_LIST) | tests test_output vcd_output $(SIMPLE_PROGRAMS)
 
 # Targets for viewing RTL of the code
 $(OUTPUT_NAME).json: FORCE# $(FILE_LIST)
@@ -100,6 +109,7 @@ clean:
 	@rm -rf obj_dir
 	@rm -f *.json *.svg *.png
 	@rm -f *.x
+	@rm -rf tests
 	@rm -rf test_output
 	@rm -rf vcd_output
 

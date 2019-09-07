@@ -1,11 +1,11 @@
 ASM_mi=$(wildcard rv32mi/*.S)
 ASM_si=$(wildcard rv32si/*.S)
-ASM_ua=$(wildcard rv32ua/*.S)
-ASM_uc=$(wildcard rv32uc/*.S)
-ASM_ud=$(wildcard rv32ud/*.S)
-ASM_uf=$(wildcard rv32uf/*.S)
+#ASM_ua=$(wildcard rv32ua/*.S)
+#ASM_uc=$(wildcard rv32uc/*.S)
+#ASM_ud=$(wildcard rv32ud/*.S)
+#ASM_uf=$(wildcard rv32uf/*.S)
 ASM_ui=$(wildcard rv32ui/*.S)
-ASM_um=$(wildcard rv32um/*.S)
+#ASM_um=$(wildcard rv32um/*.S)
 ASM=$(ASM_mi) $(ASM_si) $(ASM_ua) $(ASM_uc) $(ASM_ud) $(ASM_uf) $(ASM_ui) $(ASM_um)
 ELFS=$(ASM:.S=.elf)
 DMP=$(ASM:.S=.d)
@@ -17,7 +17,7 @@ CC = riscv32-unknown-elf-gcc
 OBJDUMP = riscv32-unknown-elf-objdump 
 OBJCOPY = riscv32-unknown-elf-objcopy
 
-CFLAGS = -static -nostdlib -O0 -fno-delayed-branch -fomit-frame-pointer -nostartfiles #-Ttext=0x10000000
+CFLAGS = -static -nostdlib -O0 -fno-delayed-branch -fomit-frame-pointer -nostartfiles -I. -I..#-Ttext=0x10000000
 CORE = -march=rv32gc
 
 LINKERFILE= -T ece429.ld
