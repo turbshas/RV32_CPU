@@ -50,12 +50,11 @@ sim_verilator: $(VTRACEFILE)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-#INSTR_TEST_FILES:=$(MKFILE_DIR)/benchmarks/individual_instructions/*.x
-#SIMPLE_PROGRAM_FILES:=$(MKFILE_DIR)/benchmarks/simple_programs/*.x
-#INSTR_TESTS:=$(foreach test, $(shell ls $(INSTR_TEST_FILES)), \
+INSTR_TEST_FILES:=$(wildcard $(MKFILE_DIR)/benchmarks/individual_instructions/*/*.x)
+SIMPLE_PROGRAM_FILES:=$(wildcard $(MKFILE_DIR)/benchmarks/simple_programs/*.x)
+INSTR_TESTS:=$(foreach test, $(INSTR_TEST_FILES), \
 	test_output/instr_$(basename $(notdir $(test))).out)
-#SIMPLE_PROGRAMS:=$(foreach program, \
-	$(filter-out fact.x, $(shell ls $(SIMPLE_PROGRAM_FILES))), \
+SIMPLE_PROGRAMS:=$(foreach program, $(SIMPLE_PROGRAM_FILES), \
 	test_output/program_$(basename $(notdir $(program))).out)
 
 instr_%.x:
@@ -64,8 +63,8 @@ instr_%.x:
 program_%.x:
 	@cp $(MKFILE_DIR)/benchmarks/simple_programs/$(notdir $*).x ./$(notdir $@)
 
-%.out: $(notdir %.x)
-	@make build_verilator TEST_FILE=$(notdir $<)
+%.out: %.x
+	@make build_verilator TEST_FILE=$<
 	obj_dir/$(VERILATOR_NAME) > test_output/$(notdir $*).out
 	cp $(VTRACEFILE) vcd_output/$(notdir $*).vcd
 
