@@ -9,17 +9,22 @@
 module mem
 (
     input wire clock,
+    input wire reset,
     input wire[31:0] address,
     input wire[31:0] data_in,
     output reg[31:0] data_out,
     input wire read_write,
     input wire[1:0] access_size,
-    input wire unsigned_access
+    input wire unsigned_access,
+
+    input wire[31:0] setup_address,
+    input wire[31:0] setup_data_in,
+    input wire setup_write
 );
 
 reg[7:0] data[0:`MEM_SIZE - 1];
 
-`ifndef BUILDING_RTL
+`ifdef FAKE_DEFINE //ndef BUILDING_RTL
 integer i=0;
 reg[31:0] temp[0:`TEMP_SIZE - 1];
 initial begin
@@ -33,6 +38,16 @@ initial begin
     end
 end
 `endif
+
+/* Preparing data at runtime */
+always @(posedge clock) begin
+    if (reset && setup_write) begin
+        data[setup_address] <= setup_data_in[7:0];
+        data[setup_address + 1] <= setup_data_in[15:8];
+        data[setup_address + 2] <= setup_data_in[23:16];
+        data[setup_address + 3] <= setup_data_in[31:24];
+    end
+end
 
 always @(posedge clock) begin
     if (! read_write) begin

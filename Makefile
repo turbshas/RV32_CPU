@@ -20,24 +20,21 @@ sim: $(TRACEFILE)
 ifndef $(TEST_FILE)
 TEST_FILE:=test.x
 endif
-TEST_LENGTH:=$(shell test -e $(TEST_FILE) && cat $(TEST_FILE) | wc -l)
 
 VERILATOR_NAME:=V$(TOPMODULE)
 HEADER_NAME:=$(VERILATOR_NAME).h
 VTRACEFILE:=$(VERILATOR_NAME).vcd
 TB_NAME:=$(OUTPUT_NAME)_tb.cpp
 
-obj_dir/$(VERILATOR_NAME): $(TB_NAME) $(TEST_FILE) $(FILE_LIST)
-	verilator --trace -sv --top-module $(TOPMODULE) -DTEST_FILE=\"$(TEST_FILE)\" --cc $(FILE_LIST) $(INCLUDE_DIRS) --exe $<
+obj_dir/$(VERILATOR_NAME): $(TB_NAME) $(FILE_LIST)
+	verilator --trace -sv --top-module $(TOPMODULE) --cc $(FILE_LIST) $(INCLUDE_DIRS) --exe $<
 	@echo "#define VERILATOR_NAME $(VERILATOR_NAME)" > obj_dir/$(TB_NAME)
 	@echo "#define HEADER_NAME \"$(HEADER_NAME)\"" >> obj_dir/$(TB_NAME)
-	@echo "#define TRACEFILE \"$(VTRACEFILE)\"" >> obj_dir/$(TB_NAME)
-	@echo "#define TEST_LENGTH $(TEST_LENGTH)" >> obj_dir/$(TB_NAME)
 	@cat $(TB_NAME) >> obj_dir/$(TB_NAME)
 	@make -j -C obj_dir -f $(VERILATOR_NAME).mk $(VERILATOR_NAME) > /dev/null
 
 $(VTRACEFILE): obj_dir/$(VERILATOR_NAME)
-	obj_dir/$(VERILATOR_NAME)
+	obj_dir/$(VERILATOR_NAME) $(TEST_FILE) $(VTRACEFILE)
 
 build_verilator: obj_dir/$(VERILATOR_NAME)
 
@@ -50,48 +47,48 @@ sim_verilator: $(VTRACEFILE)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-INSTR_TEST_DIRS:=$(wildcard $(MKFILE_DIR)/benchmarks/individual_instructions/*)
+TEST_DIR := tests
+INSTR_TEST_DIR := $(TEST_DIR)/individual_instructions
+INSTR_TEST_DIRS:=$(wildcard $(INSTR_TEST_DIR)/*)
+SIMPLE_PROGRAM_DIR := $(TEST_DIR)/simple_programs
+
+INSTR_TEST_OUTPUT_DIRS := $(patsubst $(TEST_DIR)/%, test_output/%, $(INSTR_TEST_DIRS))
+INSTR_TEST_VCD_DIRS := $(patsubst $(TEST_DIR)/%, vcd_output/%, $(INSTR_TEST_DIRS))
+SIMPLE_PROGRAM_OUTPUT_DIR := test_output/simple_programs
+SIMPLE_PROGRAM_VCD_DIR := vcd_output/simple_programs
+TEST_OUTPUT_DIRS := $(INSTR_TEST_OUTPUT_DIRS) \
+					$(INSTR_TEST_VCD_DIRS) \
+					$(SIMPLE_PROGRAM_OUTPUT_DIR) \
+					$(SIMPLE_PROGRAM_VCD_DIR)
+
 INSTR_TEST_FILES:=$(foreach d, $(INSTR_TEST_DIRS), $(wildcard $(d)/*.x))
-SIMPLE_PROGRAM_FILES:=$(wildcard $(MKFILE_DIR)/benchmarks/simple_programs/*.x)
-INSTR_TESTS:=$(INSTR_TEST_FILES:.x=.out)#$(foreach test, $(INSTR_TEST_FILES), \
-	test_output/instr_$(basename $(notdir $(test))).out)
-SIMPLE_PROGRAMS:=$(SIMPLE_PROGRAM_FILES:.x=.out)#$(foreach program, $(SIMPLE_PROGRAM_FILES), \
-	test_output/program_$(basename $(notdir $(program))).out)
+SIMPLE_PROGRAM_FILES:=$(wildcard $(SIMPLE_PROGRAM_DIR)/*.x)
 
-#$(warning $(INSTR_TEST_DIRS))
-#$(warning $(INSTR_TEST_FILES))
-#$(foreach d, $(INSTR_TEST_DIRS), $(warning $(d)/*.x))
+INSTR_TESTS_VCD:=$(INSTR_TEST_FILES:.x=.vcd)
+SIMPLE_PROGRAMS_VCD:=$(SIMPLE_PROGRAM_FILES:.x=.vcd)
+INSTR_TESTS_OUT := $(patsubst tests/%.x, test_output/%.out, $(INSTR_TEST_FILES))
+SIMPLE_PROGRAMS_OUT := $(patsubst tests/%.x, test_output/%.out, $(SIMPLE_PROGRAM_FILES))
+INSTR_TESTS_VCD := $(patsubst tests/%.x, vcd_output/%.vcd, $(INSTR_TEST_FILES))
+SIMPLE_PROGRAMS_VCD := $(patsubst tests/%.x, vcd_output/%.vcd, $(SIMPLE_PROGRAM_FILES))
 
-instr_%.x:
-	@cp $(MKFILE_DIR)/benchmarks/individual_instructions/$(notdir $*).x ./$(notdir $@)
+test_output/%.out : tests/%.x obj_dir/$(VERILATOR_NAME)
+	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
 
-program_%.x:
-	@cp $(MKFILE_DIR)/benchmarks/simple_programs/$(notdir $*).x ./$(notdir $@)
+vcd_output/%.vcd: tests/%.x
+	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
 
-%.out:
-	@cp $*.x tests/$(notdir $*.x)
-	@make build_verilator TEST_FILE=tests/$(notdir $*.x)
-	obj_dir/$(VERILATOR_NAME) > test_output/$(notdir $*).out
-	cp $(VTRACEFILE) vcd_output/$(notdir $*).vcd
+$(TEST_OUTPUT_DIRS):
+	@mkdir -p $@
 
-tests:
-	@mkdir tests
+test: $(TEST_OUTPUT_DIRS) $(INSTR_TESTS_OUT) $(SIMPLE_PROGRAMS_OUT)
 
-test_output:
-	@mkdir test_output
+test_instr: $(INSTR_TEST_OUTPUT_DIRS) $(INSTR_TEST_VCD_DIRS) $(INSTR_TESTS_OUT)
 
-vcd_output:
-	@mkdir vcd_output
-
-test: $(FILE_LIST) | tests test_output vcd_output $(INSTR_TESTS) $(SIMPLE_PROGRAMS)
-
-test_instr: $(FILE_LIST) | tests test_output vcd_output $(INSTR_TESTS)
-
-test_simple: $(FILE_LIST) | tests test_output vcd_output $(SIMPLE_PROGRAMS)
+test_simple: $(SIMPLE_PROGRAM_OUTPUT_DIR) $(SIMPLE_PROGRAM_VCD_DIR) $(SIMPLE_PROGRAMS_OUT)
 
 # Targets for viewing RTL of the code
-$(OUTPUT_NAME).json: FORCE# $(FILE_LIST)
-	yosys -p "read_verilog $(INCLUDE_DIRS) -DBUILDING_RTL $(FILE_LIST); prep -top $(TOPMODULE) -flatten; write_json $@" 1>/dev/null
+$(OUTPUT_NAME).json: $(FILE_LIST)
+	yosys -p "read_verilog $(INCLUDE_DIRS) -DBUILDING_RTL $< ; prep -top $(TOPMODULE) -flatten; write_json $@" 1>/dev/null
 
 $(OUTPUT_NAME).svg: $(OUTPUT_NAME).json
 	netlistsvg $< -o $@

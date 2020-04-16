@@ -4,7 +4,11 @@ module core
     input wire clock,
     input wire reset,
     output wire[31:0] instr_out,
-    output reg[31:0] registers[32]
+    output reg[31:0] registers[32],
+
+    input wire setup_write,
+    input wire[31:0] setup_address,
+    input wire[31:0] setup_data_in
 );
 /* Pipeline registers */
 reg[31:0] F_D_PC_out;
@@ -30,13 +34,18 @@ reg[31:0] imem_out;
 mem imem(
     /* Inputs */
     .clock(clock),
+    .reset(reset),
     .address(PC_out),
     .data_in(),
     .read_write(1),
     .access_size(`ACCESS_SIZE_WORD),
     .unsigned_access(1),
     /* Outputs */
-    .data_out(imem_out)
+    .data_out(imem_out),
+    /* Setup stuff for tests */
+    .setup_write(setup_write),
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in)
 );
 
 reg stall_F_D;
@@ -246,13 +255,18 @@ reg[31:0] dmem_out;
 mem dmem(
     /* Inputs */
     .clock(clock),
+    .reset(reset),
     .address(X_M_exec_unit_out),
     .data_in(dmem_data_in),
     .read_write(dmem_RW),
     .access_size(dmem_access_size),
     .unsigned_access(dmem_load_unsigned),
     /* Outputs */
-    .data_out(dmem_out)
+    .data_out(dmem_out),
+    /* Setup stuff for tests */
+    .setup_write(setup_write),
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in)
 );
 
 reg[31:0] write_back_out; // could change to rd_in directly
