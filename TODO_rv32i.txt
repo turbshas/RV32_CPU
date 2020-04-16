@@ -1,6 +1,34 @@
+- Branch predictor
+- Privileges
+- Interrupts
+  - especially w/ dynamic scheduling in mind
+  - Exceptions carried forward until they reach M stage
+  - Interrupts received in M stage
+  - If control logic sees exception, don't do datapath logic - just pass exception forward
+- Multiplication/divide instructions (M extension)
+  - MUL/MULH[S][U]/MULW
+  - MULH followed by MUL should only do 1 multiplication
+  - Bunch of DIV stuff as well
+- Cache:
+  - Write back, write allocate
+  - Cache prediction
+  - Cache coherency:
+    - MOESI probably
+    - Directory based probably
+- Virtual memory:
+  - TLB
+  - Physical tag, virtual index
+  - 4K pages?
+- SMT at some point
+- Maybe some amount of superscalar
+- Register renaming
+- Dynamic scheduling (MIPS R10K style):
+  - IF, DS, IS, EX, CM, RT
+  - Reorder buffer
+  - Mem order buffer
 - For taken branches and unconditional jumps, generate exception if target misaligned (do not do so on branch that isn't taken)
 - May want to have exception for load into x0
-- Support misaligned data memory access
+- Support misaligned data memory access?
 - Instructions:
   - FENCE (device Input, device Output, memory Reads, memory Writes)
     - Memory model: program-order for local hart, relaxed constraints across all harts - FENCE required to enforce ordering
@@ -26,3 +54,10 @@
     - rd is return value
   - EBREAK
 
+Priority things to do:
+- RV32I instructions
+- Interrupts
+- Cache
+- Virtual memory
+- Branch Predictor
+- Privileges

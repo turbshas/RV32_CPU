@@ -46,8 +46,6 @@ always @(*) begin
 end
 
 /* Reg/Immediate stage  */
-
-// always block for determining instruction type
 always @(*) begin
     case (opcode)
         5'b11001: imm_type = `I_IMM_T;
@@ -61,8 +59,6 @@ always @(*) begin
         default: imm_type = `NONE_IMM_T;
     endcase
 end
-
-// 
 
 /* Execute Stage  */
 
