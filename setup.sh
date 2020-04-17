@@ -55,6 +55,3 @@ if ask "Would you like to install the riscv toolchain and tests?" "N"; then
     echo "~/riscv/bin"
 fi
 
-ln -s benchmarks single_cycle/tests
-ln -s benchmarks io_pipelined/tests
-

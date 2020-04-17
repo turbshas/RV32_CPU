@@ -24,21 +24,6 @@ module mem
 
 reg[7:0] data[0:`MEM_SIZE - 1];
 
-`ifdef FAKE_DEFINE //ndef BUILDING_RTL
-integer i=0;
-reg[31:0] temp[0:`TEMP_SIZE - 1];
-initial begin
-    $readmemh(`TEST_FILE, temp);
-
-    for (i = 0; i < `TEMP_SIZE; i = i + 1) begin
-        data[(i * 4) + 0 + 32'h01000000] = temp[i][7:0];
-        data[(i * 4) + 1 + 32'h01000000] = temp[i][15:8];
-        data[(i * 4) + 2 + 32'h01000000] = temp[i][23:16];
-        data[(i * 4) + 3 + 32'h01000000] = temp[i][31:24];
-    end
-end
-`endif
-
 /* Preparing data at runtime */
 always @(posedge clock) begin
     if (reset && setup_write) begin

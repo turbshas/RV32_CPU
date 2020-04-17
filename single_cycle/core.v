@@ -4,19 +4,28 @@ module core
     input wire reset,
     output wire[31:0] pc_out,
     output wire[31:0] instr_out,
-    output reg[31:0] registers[32]
+    output reg[31:0] registers[32],
+
+    input wire setup_write,
+    input wire[31:0] setup_address,
+    input wire[31:0] setup_data_in
 );
 
 reg[31:0] PC_out;
 reg[31:0] imem_out;
 mem imem(
     .clock(clock),
+    .reset(reset),
     .address(PC_out),
     .data_in(),
     .data_out(imem_out),
     .read_write(1),
     .access_size(`ACCESS_SIZE_WORD),
-    .unsigned_access(1)
+    .unsigned_access(1),
+    /* Setup stuff for tests */
+    .setup_write(setup_write),
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in)
 );
 
 reg pc_input_sel;
@@ -94,12 +103,17 @@ reg[1:0] dmem_access_size;
 reg dmem_load_unsigned;
 mem dmem(
     .clock(clock),
+    .reset(reset),
     .address(exec_unit_out),
     .data_in(dmem_in),
     .data_out(dmem_out),
     .read_write(dmem_RW),
     .access_size(dmem_access_size),
-    .unsigned_access(dmem_load_unsigned)
+    .unsigned_access(dmem_load_unsigned),
+    /* Setup stuff for tests */
+    .setup_write(setup_write),
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in)
 );
 
 reg[1:0] write_back_sel;

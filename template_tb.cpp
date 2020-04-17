@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     const char *trace_file_name = argv[2];
 
     const size_t file_contents_len = 1024;
-    uint32_t file_contents[dest_len];
+    uint32_t file_contents[file_contents_len];
     const size_t lines_read = read_in_file(test_file_name, file_contents, file_contents_len);
 
     Verilated::commandArgs(argc, argv);
