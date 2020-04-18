@@ -47,44 +47,35 @@ sim_verilator: $(VTRACEFILE)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
+# Directories where tests are contained
 TEST_DIR := $(MKFILE_DIR)/benchmarks
 INSTR_TEST_DIR := $(TEST_DIR)/individual_instructions
 INSTR_TEST_DIRS := $(wildcard $(INSTR_TEST_DIR)/*/.)
 SIMPLE_PROGRAM_DIR := $(TEST_DIR)/simple_programs
 
-INSTR_TEST_OUTPUT_DIRS := $(patsubst $(TEST_DIR)/%, test_output/%, $(INSTR_TEST_DIRS))
-INSTR_TEST_VCD_DIRS := $(patsubst $(TEST_DIR)/%, vcd_output/%, $(INSTR_TEST_DIRS))
-SIMPLE_PROGRAM_OUTPUT_DIR := test_output/simple_programs
-SIMPLE_PROGRAM_VCD_DIR := vcd_output/simple_programs
-TEST_OUTPUT_DIRS := $(INSTR_TEST_OUTPUT_DIRS) \
-					$(INSTR_TEST_VCD_DIRS) \
-					$(SIMPLE_PROGRAM_OUTPUT_DIR) \
-					$(SIMPLE_PROGRAM_VCD_DIR)
-
+# Test files in those directories
 INSTR_TEST_FILES:=$(foreach d, $(INSTR_TEST_DIRS), $(wildcard $(d)/*.x))
 SIMPLE_PROGRAM_FILES:=$(wildcard $(SIMPLE_PROGRAM_DIR)/*.x)
 
-INSTR_TESTS_VCD:=$(INSTR_TEST_FILES:.x=.vcd)
-SIMPLE_PROGRAMS_VCD:=$(SIMPLE_PROGRAM_FILES:.x=.vcd)
+# Files output from testing (.out = console output, .vcd = trace file)
 INSTR_TESTS_OUT := $(patsubst $(TEST_DIR)/%.x, test_output/%.out, $(INSTR_TEST_FILES))
 SIMPLE_PROGRAMS_OUT := $(patsubst $(TEST_DIR)/%.x, test_output/%.out, $(SIMPLE_PROGRAM_FILES))
 INSTR_TESTS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(INSTR_TEST_FILES))
 SIMPLE_PROGRAMS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(SIMPLE_PROGRAM_FILES))
 
-test_output/%.out : $(TEST_DIR)/%.x obj_dir/$(VERILATOR_NAME)
+test_output/%.out: $(TEST_DIR)/%.x obj_dir/$(VERILATOR_NAME)
+	@mkdir $(notdir $@)
 	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
 
 vcd_output/%.vcd: $(TEST_DIR)/%.x
+	@mkdir $(notdir $@)
 	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
 
-$(TEST_OUTPUT_DIRS):
-	@mkdir -p $@
+test: $(INSTR_TESTS_OUT) $(SIMPLE_PROGRAMS_OUT)
 
-test: $(TEST_OUTPUT_DIRS) $(INSTR_TESTS_OUT) $(SIMPLE_PROGRAMS_OUT)
+test_instr: $(INSTR_TESTS_OUT)
 
-test_instr: $(INSTR_TEST_OUTPUT_DIRS) $(INSTR_TEST_VCD_DIRS) $(INSTR_TESTS_OUT)
-
-test_simple: $(SIMPLE_PROGRAM_OUTPUT_DIR) $(SIMPLE_PROGRAM_VCD_DIR) $(SIMPLE_PROGRAMS_OUT)
+test_simple: $(SIMPLE_PROGRAMS_OUT)
 
 # Targets for viewing RTL of the code
 $(OUTPUT_NAME).json: $(FILE_LIST)
