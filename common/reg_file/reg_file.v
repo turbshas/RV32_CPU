@@ -1,17 +1,18 @@
 module reg_file
+parameter REG_ADDR_WIDTH = 5;
 (
     input wire clock,
-    input wire[4:0] addr_rs1,
-    input wire[4:0] addr_rs2,
-    input wire[4:0] addr_rd,
+    input wire[REG_ADDR_WIDTH - 1:0] addr_rs1,
+    input wire[REG_ADDR_WIDTH - 1:0] addr_rs2,
+    input wire[REG_ADDR_WIDTH - 1:0] addr_rd,
     input wire[31:0] data_rd,
     output reg[31:0] data_rs1,
     output reg[31:0] data_rs2,
     input wire write_enable,
-    output wire[31:0] registers_out[32]
+    output wire[31:0] registers_out[2**REG_ADDR_WIDTH]
 );
 
-reg[31:0] registers[32];
+reg[31:0] registers[2**REG_ADDR_WIDTH];
 assign registers_out = registers;
 
 `ifndef BUILDING_RTL
@@ -30,7 +31,7 @@ end
 
 always @(posedge clock) begin
     if (write_enable) begin
-        if (addr_rd != 5'b0) begin
+        if (addr_rd != REG_ADDR_WIDTH'b0) begin
             registers[addr_rd] <= data_rd;
         end
     end

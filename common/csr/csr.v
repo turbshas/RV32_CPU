@@ -26,12 +26,6 @@ always @(posedge clock) begin
     if (reset) begin
         cycle_counter = 64'h0;
     end else begin
-        if (write_csr && ((csr_num == `CSR_RDCYCLE) || (csr_num == `CSR_RDCYCLEH))) begin
-            illegal_instr_exception = 1;
-        end else begin
-            illegal_instr_exception = 0;
-        end
-
         cycle_counter = cycle_counter + 1;
     end
 end
@@ -40,12 +34,6 @@ always @(posedge clock) begin
     if (reset) begin
         time_counter = 64'h0;
     end else begin
-        if (write_csr && ((csr_num == `CSR_RDTIME) || (csr_num == `CSR_RTIMEH))) begin
-            illegal_instr_exception = 1;
-        end else begin
-            illegal_instr_exception = 0;
-        end
-
         /* For now, time = clock cycle. TODO: have an actual timer */
         time_counter = time_counter + 1;
     end
@@ -55,12 +43,6 @@ always @(posedge close) begin
     if (reset) begin
         retired_instr_counter = 64'h0;
     end else begin
-        if (write_csr && ((csr_num == `CSR_RDINSTRET) || (csr_num == `CSR_RDINSTRETH))) begin
-            illegal_instr_exception = 1;
-        end else begin
-            illegal_instr_exception = 0;
-        end
-
         if (instr_retired) begin
             retired_instr_counter = retired_instr_counter + 1;
         end
@@ -85,3 +67,14 @@ always @(*) begin
     end
 end
 
+always @(*) begin
+    if (write_csr) begin
+        if (csr_num == `CSR_RDCYCLE || csr_num == `CSR_RDCYCLEH
+         || csr_num == `CSR_RDTIME || csr_num == `CSR_RDTIMEH
+         || csr_num == `CSR_RDINSTRET || csr_num == `CSR_RDINSTRETH) begin
+             illegal_instr_exception = 1;
+         end else begin
+             illegal_instr_exception = 0;
+         end
+    end
+end

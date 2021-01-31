@@ -52,12 +52,16 @@
     - Essentially, supervisor call
     - rs1 is argument passed to system function
     - rd is return value
+    - should just be interrupt
   - EBREAK
+    - should be interrupt probably, but what would it do?
 
 Priority things to do:
-- RV32I instructions
+- MIPS R10K/Pentium style OoO execution
+- Register renaming
 - Interrupts
+- Branch Predictor
 - Cache
 - Virtual memory
-- Branch Predictor
+- RV32I instructions
 - Privileges
