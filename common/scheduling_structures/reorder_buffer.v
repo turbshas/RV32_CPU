@@ -1,11 +1,7 @@
 module reorder_buffer
-parameter ROB_ADDR_WIDTH = 3;
+parameter ROB_ADDR_WIDTH = 5;
           REG_FILE_ADDR_WIDTH = 7;
 (
-    // ROB status signals
-    input wire complete_instr,
-    input wire[ROB_ADDR_WIDTH - 1:0] completed_addr,
-
     // ROB read signals
     output wire retiring_instr,
     output wire[31:0] instr_out,
@@ -14,7 +10,6 @@ parameter ROB_ADDR_WIDTH = 3;
 
     // ROB write signals
     input wire write_en,
-    input wire[ROB_ADDR_WIDTH - 1:0] write_addr,
     input wire[31:0] instr_in,
     input wire[REG_FILE_ADDR_WIDTH - 1:0] dest_reg_in,
     input wire[REG_FILE_ADDR_WIDTH - 1:0] old_reg_in,
@@ -22,10 +17,12 @@ parameter ROB_ADDR_WIDTH = 3;
     // Control signals
     input wire clock,
     input wire reset,
+    input wire complete_instr,
+    input wire[ROB_ADDR_WIDTH - 1:0] completed_addr,
     output wire empty,
     output wire full
 );
-// TODO: interrupt handling
+// TODO: interrupt/branch misprediction handling
 
 reg[31:0] instrs[2**ROB_ADDR_WIDTH];
 reg valid[2**ROB_ADDR_WIDTH];
