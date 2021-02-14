@@ -27,21 +27,21 @@ assign full = (head + 2**REG_ADDR_WIDTH - 32) == tail;
 integer i;
 always @(posedge clock) begin
     if (reset) begin
-        head = 0;
-        tail = 2**REG_FILE_ADDR_WIDTH - 32 - 1;
+        head <= 0;
+        tail <= 2**REG_FILE_ADDR_WIDTH - 32 - 1;
         for (i = 0; i < 2**REG_FILE_ADDR_WIDTH - 32; i = i + 1) begin
-            free_regs[i] = i + 32;
+            free_regs[i] <= i + 32;
         end
         for (i = 2**REG_FILE_ADDR_WIDTH - 32; i < 2**REG_FILE_ADDR_WIDTH; i = i + 1) begin
-            free_regs[i] = 0;
+            free_regs[i] <= 0;
         end
     end else begin
         if (take_next_free && !empty) begin
-            head = head + 1;
+            head <= head + 1;
         end
         if (reg_free && !full) begin
-            free_regs[tail + 1] = freed_reg_num;
-            tail = tail + 1;
+            free_regs[tail + 1] <= freed_reg_num;
+            tail <= tail + 1;
         end
     end
 end
