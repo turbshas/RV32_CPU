@@ -33,9 +33,11 @@ parameter REG_FILE_ADDR_WIDTH = 7;
 );
 
 reg_stat stations[2**`REG_STATIONS_WIDTH];
+wire[2**REG_STATIONS_WIDTH - 1:0] write_vector;
 
 always @(*) begin
     used = valid;
+    write_vector = write_en << reg_stat_selection;
 end
 
 integer i;
