@@ -59,71 +59,75 @@ typedef logic[6:0] opcode32_t;
 typedef logic[4:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
 typedef logic[6:0] funct7_t;
+typedef logic[3:0] fence_fm_t;
 
 typedef struct packed {
-    logic writes;
-    logic reads;
-    logic device_output;
     logic device_input;
+    logic device_output;
+    logic reads;
+    logic writes;
 } fence_access_ordering;
 
 typedef struct packed {
-    arch_reg_id rd;
+    fence_fm_t fm;
+    fence_access_ordering predecessor;
+    fence_access_ordering successor;
+    arch_reg_id rs1;
     funct3_t funct3;
+    arch_reg_id rd;
 } fence_instr_params;
 
 typedef struct packed {
-    arch_reg_id rd;
-    funct3_t funct3;
-    arch_reg_id rs1;
-    arch_reg_id rs2;
     funct7_t funct7;
+    arch_reg_id rs2;
+    arch_reg_id rs1;
+    funct3_t funct3;
+    arch_reg_id rd;
 } r_instr_params;
 
 typedef struct packed {
-    arch_reg_id rd;
-    funct3_t funct3;
-    arch_reg_id rs1;
     logic[11:0] imm;
+    arch_reg_id rs1;
+    funct3_t funct3;
+    arch_reg_id rd;
 } i_instr_params;
 
 typedef struct packed {
+    logic[11:5] imm_b11to5;
+    arch_reg_id rs2;
+    arch_reg_id rs1;
+    funct3_t funct3;
     // Concatenated onto imm_11to5 -> imm[11:0]
     logic[4:0] imm_b4to0;
-    funct3_t funct3;
-    arch_reg_id rs1;
-    arch_reg_id rs2;
-    logic[11:5] imm_b11to5;
 } s_instr_params;
 
 typedef struct packed {
+    logic imm_b12;
+    logic[5:0] imm_b10to5;
+    arch_reg_id rs2;
+    arch_reg_id rs1;
+    funct3_t funct3;
+    logic[3:0] imm_b4to1;
     // Concatenate { imm_b12, imm_b11, imm_b10to5, imm_b4to1, } to form final immediate.
     // (bit 0 must be zero as the branch must be 2-aligned).
     logic imm_b11;
-    logic[3:0] imm_b4to1;
-    funct3_t funct3;
-    arch_reg_id rs1;
-    arch_reg_id rs2;
-    // Bit 12, followed by bits 10:5.
-    logic[5:0] imm_b10to5;
-    logic imm_b12;
 } b_instr_params;
 
 typedef struct packed {
-    arch_reg_id rd;
     // Comprises only the upper 20 bits of the immediate.
     // The value of PC is added to this to form the resulting address.
     logic[19:0] imm_31to12;
+    arch_reg_id rd;
 } u_instr_params;
 
 typedef struct packed {
-    arch_reg_id rd;
     // Rearrange { imm_b20, imm_b19to12, imm_b11, imm_b10to1, } to form final immediate.
     // (bit 0 must be zero as the branch must be 2-aligned).
-    logic[7:0] imm_b19to12;
-    logic imm_b11;
-    logic[9:0] imm_b10to1;
     logic imm_b20;
+    logic[9:0] imm_b10to1;
+    logic imm_b11;
+    logic[7:0] imm_b19to12;
+    arch_reg_id rd;
 } j_instr_params;
 
 typedef union packed {
@@ -137,6 +141,8 @@ typedef union packed {
 } instr_params;
 
 typedef struct packed {
-    opcode32_t opcode;
     instr_params params;
+    opcode32_t opcode;
 } instr_packet;
+
+typedef logic[31:0] arch_reg;

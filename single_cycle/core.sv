@@ -1,3 +1,5 @@
+`include "exec_unit_interfaces.sv"
+
 module core
 (
     input wire clock,
@@ -75,21 +77,17 @@ imm_gen imm_gen_inst(
     .immediate_out(imm_out)
 );
 
-reg[3:0] exec_op;
+exec_unit_params exec_params;
 reg[31:0] exec_unit_out;
 assign new_PC_in = exec_unit_out;
-reg operand1_sel;
-reg operand2_sel;
 // TODO in PD5: chnage to support bypassing
 exec_unit exec_unit_inst(
     // inputs
     .pc(PC_out),
     .rs1(rs1_out),
     .rs2(rs2_out),
-    .operand1_sel(operand1_sel),
-    .operand2_sel(operand2_sel),
     .imm_val(imm_out),
-    .exec_op(exec_op),
+    .params(exec_params)
 
     // outputs
     .exec_out(exec_unit_out)
@@ -139,15 +137,13 @@ decode decode_inst(
     .instr(instr),
     .branch_cmp_eq(branch_cmp_eq_out),
     .branch_cmp_lt(branch_cmp_lt_out),
-    .exec_op(exec_op),
     .reg_write_en(reg_file_WE),
     .reg_store_sel(write_back_sel),
     .rd(rd_addr),
     .rs1(rs1_addr),
     .rs2(rs2_addr),
     .imm_type(imm_type),
-    .operand1_sel(operand1_sel),
-    .operand2_sel(operand2_sel),
+    .exec_params(exec_params)
     .pc_input_sel(pc_input_sel),
     .mem_r_w(dmem_RW),
     .mem_access_size(dmem_access_size),

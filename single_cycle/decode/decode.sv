@@ -1,4 +1,5 @@
 `include "constants.sv"
+`include "exec_unit_interfaces.sv"
 
 module decode
 (
@@ -7,15 +8,13 @@ module decode
     input instr_packet instr,
     input wire branch_cmp_eq,
     input wire branch_cmp_lt,
-    output reg[3:0] exec_op,
     output reg reg_write_en,
     output reg[1:0] reg_store_sel,
     output arch_reg_id rd,
     output arch_reg_id rs1,
     output arch_reg_id rs2,
     output reg[2:0] imm_type,
-    output reg operand1_sel,
-    output reg operand2_sel,
+    output exec_unit_params exec_params,
     output reg pc_input_sel,
     output reg mem_r_w,
     output reg[1:0] mem_access_size,
@@ -36,21 +35,21 @@ fence_instr_params fence_successor;
 // always block for picking out pieces of the instruction
 always @(*) begin
     opcode = instr.opcode;
-    rd     = instr[11:7];
-    funct3 = instr[14:12];
-    rs2    = instr[24:20];
-    funct7 = instr[31:25];
+    rd     = instr.params.r_instr.rd;
+    funct3 = instr.params.r_instr.funct3;
+    rs2    = instr.params.r_instr.rs2;
+    funct7 = instr.params.r_instr.funct7;
 
     case (opcode)
         // LUI makes rs1 need to be set to reg 0
         `OPCODE_LUI: rs1 = 5'b00000;
-        default: rs1 = instr[19:15];
+        default: rs1 = instr.params.r_instr.rs1;
     endcase
 
     // Fence-specific values
-    fence_fm = instr[31:28];
-    fence_predecessor = instr[27:24];
-    fence_successor = instr[23:20];
+    fence_fm = instr.params.fence.fm;
+    fence_predecessor = instr.params.fence.predecessor;
+    fence_successor = instr.params.fence.successor;
 end
 
 /* Reg/Immediate stage  */
@@ -78,11 +77,11 @@ always @(*) begin
     // changes based on r type or not used
     case (opcode)
         // R-Type
-        `OPCODE_OP: exec_op = {funct7[5], funct3};
+        `OPCODE_OP: exec_params.exec_op = {funct7[5], funct3};
         // I-Type
-        `OPCODE_OP_IMM: exec_op = {I_type_funct7, funct3};
+        `OPCODE_OP_IMM: exec_params.exec_op = {I_type_funct7, funct3};
         // All others, use add
-        default: exec_op = 4'b0000;
+        default: exec_params.exec_op = 4'b0000;
     endcase
 end
 
@@ -92,26 +91,24 @@ always @(*) begin
         // R-Type
         `OPCODE_OP:
         begin
-            operand1_sel = 0; // reg
-            operand2_sel = 0; // reg
+            exec_params.operand1_sel = `OP1_SEL_REG;
+            exec_params.operand2_sel = `OP2_SEL_REG;
         end
 
         // B-Type, J-Type, AUIPC
         `OPCODE_BRANCH, `OPCODE_JAL, `OPCODE_AUIPC:
         begin
-            operand1_sel = 1; // PC
-            operand2_sel = 1; // imm
+            exec_params.operand1_sel = `OP1_SEL_PC;
+            exec_params.operand2_sel = `OP2_SEL_IMM;
         end
 
         // I-Type, S-Type, JALR, LUI (make sure rs1 is set to x0)
         //5'b00100, 5'b01000, 5'11001, 5'b01101:
         default:
         begin
-            operand1_sel = 0; // reg
-            operand2_sel = 1; // imm
+            exec_params.operand1_sel = `OP1_SEL_REG;
+            exec_params.operand2_sel = `OP2_SEL_IMM;
         end
-
-
     endcase
 end
 
@@ -181,8 +178,10 @@ always @(*) begin
     end
 end
 
+/* Memory stage */
+
 // mem_r_w
-// mem is R/!W
+// mem is R/!W (R = 1, W = 0)
 always @(*) begin
     if (reset)
         mem_r_w = 1;

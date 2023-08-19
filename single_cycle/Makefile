@@ -1,13 +1,14 @@
 FILE_LIST:=\
-	decode/decode.v \
+	decode/decode.sv \
 	../common/mem/mem.v \
 	../common/fetch/fetch.v \
 	../common/imm_gen/imm_gen.v \
 	../common/reg_file/reg_file.v \
 	../common/branch_compare/branch_compare.v \
-	../common/exec_unit/exec_unit.v \
+	../common/exec_unit/exec_unit.sv \
+	../common/exec_unit/exec_unit_interfaces.sv \
 	../common/write_back/write_back.v \
-	core.v
+	core.sv
 
 INCLUDE_DIRS:=\
 	-I. \
