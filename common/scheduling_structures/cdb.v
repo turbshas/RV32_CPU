@@ -10,3 +10,5 @@ parameter REG_FILE_ADDR_WIDTH = 7;
 // For now, just passthrough
 assign cdb_valid = valid;
 assign cdb_value = value;
+
+endmodule

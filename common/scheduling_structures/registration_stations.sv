@@ -3,7 +3,7 @@
 module registration_station
 parameter REG_FILE_ADDR_WIDTH = 7;
 
-    typedef struct {
+    typedef struct packed {
         reg valid;
         reg[31:0] instr;
         reg[REG_FILE_ADDR_WIDTH - 1:0] rd;
@@ -68,3 +68,5 @@ always @(posedge clock) begin
         end
     end
 end
+
+endmodule

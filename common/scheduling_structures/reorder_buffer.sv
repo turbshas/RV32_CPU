@@ -106,3 +106,5 @@ always @(posedge clock) begin
         end
     end
 end
+
+endmodule

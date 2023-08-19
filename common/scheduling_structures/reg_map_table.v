@@ -34,6 +34,7 @@ assign physical_reg_rs2 = reg_map[arch_reg_rs2];
 always @(posedge clock) begin
     if (reset) begin
         for (i = 0; i < 32; i = i + 1) begin
+            ready[i] <= 1'b0;
             reg_map[i] <= i;
         end
     end else begin
@@ -43,3 +44,5 @@ always @(posedge clock) begin
         end
     end
 end
+
+endmodule
