@@ -1,5 +1,6 @@
 `include "constants.sv"
 `include "exec_unit_interfaces.sv"
+`include "imm_gen_inc.sv"
 
 module decode
 (
@@ -13,7 +14,7 @@ module decode
     output arch_reg_id rd,
     output arch_reg_id rs1,
     output arch_reg_id rs2,
-    output reg[2:0] imm_type,
+    output imm_type_t imm_type,
     output exec_unit_params exec_params,
     output reg pc_input_sel,
     output reg mem_r_w,
@@ -23,7 +24,7 @@ module decode
 );
 
 // R-type values
-opcode_32t opcode; 
+opcode_t opcode; 
 funct3_t funct3;
 funct7_t funct7;
 

@@ -1,12 +1,14 @@
+`include "constants.sv"
 `include "exec_unit_interfaces.sv"
+`include "imm_gen_inc.sv"
 
 module core
 (
     input wire clock,
     input wire reset,
-    output wire[31:0] pc_out,
-    output wire[31:0] instr_out,
-    output reg[31:0] registers[32],
+    output arch_reg pc_out,
+    output instr_packet instr_out,
+    output arch_reg registers[32],
 
     input wire setup_write,
     input wire[31:0] setup_address,
@@ -69,10 +71,10 @@ branch_compare branch_compare_inst(
     .equal(branch_cmp_eq_out)
 );
 
-reg[2:0] imm_type;
-reg[31:0] imm_out;
+imm_type_t imm_type;
+arch_reg imm_out;
 imm_gen imm_gen_inst(
-    .instr(instr[31:7]),
+    .instr(instr.params),
     .imm_type(imm_type),
     .immediate_out(imm_out)
 );

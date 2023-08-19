@@ -1,10 +1,12 @@
+`include "constants.sv"
+
 module branch_compare
 (
-    input wire[31:0] rs1,
-    input wire[31:0] rs2,
-    input wire unsigned_cmp,
-    output reg less_than, /* 1 if rs1 < rs2 */
-    output reg equal /* 1 if rs1 == rs2 */
+    input arch_reg rs1,
+    input arch_reg rs2,
+    input logic unsigned_cmp,
+    output logic less_than, /* 1 if rs1 < rs2 */
+    output logic equal /* 1 if rs1 == rs2 */
 );
 
 always @(*) begin

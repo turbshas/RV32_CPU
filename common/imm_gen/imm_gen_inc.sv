@@ -7,3 +7,4 @@
 `define RSV1_IMM_T 3'b110
 `define NONE_IMM_T 3'b111
 
+typedef logic[2:0] imm_type_t;

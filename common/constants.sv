@@ -55,7 +55,7 @@
 `define FENCE_FM_NONE 4'b0000
 `define FENCE_FM_TSO  4'b1000
 
-typedef logic[6:0] opcode32_t;
+typedef logic[6:0] opcode_t;
 typedef logic[4:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
 typedef logic[6:0] funct7_t;
@@ -116,7 +116,7 @@ typedef struct packed {
 typedef struct packed {
     // Comprises only the upper 20 bits of the immediate.
     // The value of PC is added to this to form the resulting address.
-    logic[19:0] imm_31to12;
+    logic[19:0] imm;
     arch_reg_id rd;
 } u_instr_params;
 
@@ -142,7 +142,7 @@ typedef union packed {
 
 typedef struct packed {
     instr_params params;
-    opcode32_t opcode;
+    opcode_t opcode;
 } instr_packet;
 
 typedef logic[31:0] arch_reg;
