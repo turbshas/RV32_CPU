@@ -11,7 +11,7 @@ FILE_LIST:=\
 	../common/decode/decode_reg_file.sv \
 	../common/decode/decode_write_back.sv \
 	../common/exec_unit/exec_unit.sv \
-	../common/fetch/fetch.v \
+	../common/fetch/fetch.sv \
 	../common/imm_gen/imm_gen.sv \
 	../common/mem/mem.sv \
 	../common/reg_file/reg_file.sv \
