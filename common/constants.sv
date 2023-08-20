@@ -55,6 +55,13 @@
 `define FENCE_FM_NONE 4'b0000
 `define FENCE_FM_TSO  4'b1000
 
+typedef enum logic[1:0] {
+    USER = 2'b00,
+    SUPERVISOR = 2'b01,
+    RSVD = 2'b10,
+    MACHINE = 2'b11,
+} priv_mode_t;
+
 typedef logic[6:0] opcode_t;
 typedef logic[4:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
