@@ -1,6 +1,7 @@
 `include "constants.sv"
 `include "instructions.sv"
 
+`include "branch_compare_inc.sv"
 `include "csr_inc.sv"
 `include "exec_unit_inc.sv"
 `include "imm_gen_inc.sv"
@@ -8,22 +9,21 @@
 
 module decode
 (
-    input wire clock,
-    input wire reset,
+    input logic clock,
+    input logic reset,
     input instr_packet instr,
 
-    input wire branch_cmp_eq,
-    input wire branch_cmp_lt,
-    output logic branch_cmp_unsigned,
-
-    output logic reg_write_en,
-    output write_back_select_t reg_store_sel,
     output arch_reg_id rd,
     output arch_reg_id rs1,
     output arch_reg_id rs2,
     output imm_type_t imm_type,
     output exec_unit_params exec_params,
 
+    input logic branch_result,
+    output branch_compare_params_t branch_compare_params,
+
+    output logic reg_write_en,
+    output write_back_select_t reg_store_sel,
     output logic pc_input_sel,
 
     output mem_params_t mem_params,
@@ -83,15 +83,13 @@ decode_write_back decode_write_back(
 
 decode_branch_compare decode_branch_compare(
     .funct3(funct3),
-    .branch_cmp_unsigned(branch_cmp_unsigned)
+    .params(branch_compare_params)
 );
 
 decode_pc_input_select decode_pc_input_select(
     .reset(reset),
     .opcode(opcode),
-    .funct3(funct3),
-    .branch_cmp_eq(branch_cmp_eq),
-    .branch_cmp_lt(branch_cmp_lt),
+    .branch_result(branch_result),
     .pc_input_sel(pc_input_sel)
 );
 

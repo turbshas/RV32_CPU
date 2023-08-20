@@ -63,13 +63,6 @@ typedef enum logic[6:0] {
     OPCODE_80b_INST =       {2'b11, 3'b111, 2'b11},
 } opcode_t;
 
-typedef enum logic[1:0] {
-    BRANCH_COND_EQ = 2'b00,
-    BRANCH_COND_NE = 2'b01,
-    BRANCH_COND_LT = 2'b10,
-    BRANCH_COND_GE = 2'b11,
-} branch_cond_t;
-
 `define REGISTER_X0 5'b00000
 
 typedef logic[4:0] arch_reg_id;

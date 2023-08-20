@@ -1,3 +1,6 @@
+`include "instructions.sv"
+`include "mem_inc.sv"
+
 `define MEM_SIZE (64*1024*1024)
 `define TEMP_SIZE (4096)
 
@@ -8,18 +11,16 @@
 
 module mem
 (
-    input wire clock,
-    input wire reset,
-    input wire[31:0] address,
-    input wire[31:0] data_in,
-    output reg[31:0] data_out,
-    input wire read_write,
-    input wire[1:0] access_size,
-    input wire unsigned_access,
+    input logic clock,
+    input logic reset,
+    input arch_reg address,
+    input arch_reg data_in,
+    output arch_reg data_out,
+    input mem_params_t params,
 
-    input wire[31:0] setup_address,
-    input wire[31:0] setup_data_in,
-    input wire setup_write
+    input arch_reg setup_address,
+    input arch_reg setup_data_in,
+    input logic setup_write
 );
 
 reg[7:0] data[0:`MEM_SIZE - 1];

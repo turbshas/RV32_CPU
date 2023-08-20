@@ -37,21 +37,27 @@ ask() {
     done
 }
 
-if ask "Would you like to install the riscv toolchain and tests?" "N"; then
+if ask "Would you like to install the riscv toolchain and tests? This will require installing additional packages." "N"; then
+    sudo apt install autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
+
     cd ~
     git clone https://github.com/riscv/riscv-gnu-toolchain.git
     cd riscv-gnu-toolchain
-    ./configure --prefix=~/riscv --with-arch=rv32gc --with-abi=ilp32d
-    make -j
+    export RISCV=$HOME/riscv
+    ./configure --prefix=$RISCV --with-arch=rv32gc --with-abi=ilp32d
+    make
 
     cd ~
     git clone https://github.com/riscv/riscv-tests.git
     cd riscv-tests
-    export RISCV=~/riscv
-    ./configure --prefix=$RISCV/target --with-xlen=32
-    make -j
+    git submodule update --init --recursive
+    autoconf
+    ./configure --prefix=$RISCV/tests --with-xlen=32
+    RISCV_BIN=$RISCV/bin
+    export PATH=$PATH:$RISCV_BIN
+    make
 
     echo "Add the following directory to your path to use the toolchain:"
-    echo "~/riscv/bin"
+    echo "$RISCV_BIN"
 fi
 

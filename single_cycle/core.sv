@@ -1,40 +1,50 @@
 `include "constants.sv"
-`include "exec_unit_interfaces.sv"
+`include "instructions.sv"
+
+`include "branch_compare_inc.sv"
+`include "csr_inc.sv"
+`include "exec_unit_inc.sv"
 `include "imm_gen_inc.sv"
+`include "mem_inc.sv"
 
 module core
 (
-    input wire clock,
-    input wire reset,
+    input logic clock,
+    input logic reset,
     output arch_reg pc_out,
     output instr_packet instr_out,
     output arch_reg registers[32],
 
-    input wire setup_write,
-    input wire[31:0] setup_address,
-    input wire[31:0] setup_data_in
+    input logic setup_write,
+    input arch_reg setup_address,
+    input arch_reg setup_data_in
 );
 
-reg[31:0] PC_out;
-reg[31:0] imem_out;
+arch_reg PC_out;
+arch_reg imem_out;
+mem_params_t imem_params;
+always_comb begin
+    imem_params.load_unsigned = 1;
+    imem_params.access_size = MEM_ACCESS_WORD;
+    imem_params.op = MEM_OP_READ;
+end
 mem imem(
     .clock(clock),
     .reset(reset),
     .address(PC_out),
     .data_in(),
     .data_out(imem_out),
-    .read_write(1),
-    .access_size(`ACCESS_SIZE_WORD),
-    .unsigned_access(1),
+    .params(imem_params)
+
     /* Setup stuff for tests */
     .setup_write(setup_write),
     .setup_address(setup_address),
     .setup_data_in(setup_data_in)
 );
 
-reg pc_input_sel;
-reg[31:0] new_PC_in;
-reg[31:0] instr;
+logic pc_input_sel;
+arch_reg new_PC_in;
+arch_reg instr;
 fetch fetch_inst(
     .clock(clock),
     .reset(reset),
@@ -46,9 +56,9 @@ fetch fetch_inst(
     .instr(instr)
 );
 
-reg[4:0] rd_addr, rs1_addr, rs2_addr;
-reg[31:0] rd_in, rs1_out, rs2_out;
-reg reg_file_WE;
+arch_reg_id rd_addr, rs1_addr, rs2_addr;
+arch_reg rd_in, rs1_out, rs2_out;
+logic reg_file_WE;
 reg_file reg_file_inst(
     .clock(clock),
     .addr_rs1(rs1_addr),
@@ -61,14 +71,13 @@ reg_file reg_file_inst(
     .registers_out(registers)
 );
 
-reg branch_cmp_unsigned_in;
-reg branch_cmp_eq_out, branch_cmp_lt_out;
+logic branch_result;
+branch_compare_params_t branch_compare_params;
 branch_compare branch_compare_inst(
     .rs1(rs1_out),
     .rs2(rs2_out),
-    .unsigned_cmp(branch_cmp_unsigned_in),
-    .less_than(branch_cmp_lt_out),
-    .equal(branch_cmp_eq_out)
+    .params(branch_compare_params),
+    .branch_result(branch_result)
 );
 
 imm_type_t imm_type;
@@ -80,7 +89,7 @@ imm_gen imm_gen_inst(
 );
 
 exec_unit_params exec_params;
-reg[31:0] exec_unit_out;
+arch_reg exec_unit_out;
 assign new_PC_in = exec_unit_out;
 // TODO in PD5: chnage to support bypassing
 exec_unit exec_unit_inst(
@@ -95,21 +104,18 @@ exec_unit exec_unit_inst(
     .exec_out(exec_unit_out)
 );
 
-wire[31:0] dmem_in;
+arch_reg dmem_in;
 assign dmem_in = rs2_out;
-reg[31:0] dmem_out;
-reg dmem_RW;
-reg[1:0] dmem_access_size;
-reg dmem_load_unsigned;
+arch_reg dmem_out;
+mem_params_t mem_params;
 mem dmem(
     .clock(clock),
     .reset(reset),
     .address(exec_unit_out),
     .data_in(dmem_in),
     .data_out(dmem_out),
-    .read_write(dmem_RW),
-    .access_size(dmem_access_size),
-    .unsigned_access(dmem_load_unsigned),
+    .params(mem_params),
+
     /* Setup stuff for tests */
     .setup_write(setup_write),
     .setup_address(setup_address),
@@ -122,8 +128,8 @@ logic csr_illegal_instr;
 csr csr(
     .clock(clock),
     .reset(reset),
-    instr_retired, // TODO: idk? should this happen elsewhere?
-    priv_mode, // TODO: used to check if CSR address is allowed - NOTE: User CSRs always allowed
+    .instr_retired(0), // TODO: idk? should this happen elsewhere?
+    .priv_mode(2'b00), // TODO: used to check if CSR address is allowed - NOTE: User CSRs always allowed
 
     .reg_in(exec_unit_out),
     .params(csr_params),
@@ -155,24 +161,20 @@ decode decode_inst(
     .reset(reset),
     .instr(instr),
 
-    .branch_cmp_eq(branch_cmp_eq_out),
-    .branch_cmp_lt(branch_cmp_lt_out),
-    .branch_cmp_unsigned(branch_cmp_unsigned_in),
-
-    .reg_write_en(reg_file_WE),
-    .reg_store_sel(write_back_sel),
     .rd(rd_addr),
     .rs1(rs1_addr),
     .rs2(rs2_addr),
-
     .imm_type(imm_type),
     .exec_params(exec_params)
 
-    .pc_input_sel(pc_input_sel),
-    .mem_r_w(dmem_RW),
-    .mem_access_size(dmem_access_size),
-    .mem_load_unsigned(dmem_load_unsigned),
+    .branch_result(branch_result),
+    .branch_compare_params(branch_compare_params),
 
+    .reg_write_en(reg_file_WE),
+    .reg_store_sel(write_back_sel),
+    .pc_input_sel(pc_input_sel),
+
+    .mem_params(mem_params),
     .csr_params(csr_params)
 );
 
