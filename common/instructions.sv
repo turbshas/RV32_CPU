@@ -63,11 +63,25 @@ typedef enum logic[6:0] {
     OPCODE_80b_INST =       {2'b11, 3'b111, 2'b11},
 } opcode_t;
 
+typedef enum logic[1:0] {
+    BRANCH_COND_EQ = 2'b00,
+    BRANCH_COND_NE = 2'b01,
+    BRANCH_COND_LT = 2'b10,
+    BRANCH_COND_GE = 2'b11,
+} branch_cond_t;
+
 `define REGISTER_X0 5'b00000
 
 typedef logic[4:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
 typedef logic[6:0] funct7_t;
+typedef logic[31:0] arch_reg;
+
+// TODO: better place for this?
+typedef enum logic {
+    PC_INPUT_PC_PLUS_4 = 1'b0,
+    PC_INPUT_ALU = 1'b1,
+} pc_input_sel_t;
 
 typedef struct packed {
     fence_fm_t fm;
@@ -156,5 +170,3 @@ typedef struct packed {
     instr_params params;
     opcode_t opcode;
 } instr_packet;
-
-typedef logic[31:0] arch_reg;

@@ -61,7 +61,6 @@ typedef struct packed {
 typedef struct packed {
     logic read_enable;
     logic write_enable;
-    logic[4:0] imm_value;
     csr_input_sel input_select;
     csr_write_func write_func;
 } csr_params;

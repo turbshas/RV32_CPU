@@ -40,7 +40,6 @@ always_comb begin
     // CSR write is RS/RC and write source is zero -> no write occurs.
     csr_params.write_enable = is_csr_instr & (write_func == CSR_WRITE_RW | !write_source_is_zero);
 
-    csr_params.imm_value = system_params.rs1_or_uimm;
     csr_params.input_select = write_select;
     csr_params.write_func = system_params.csr_funct3.write_func;
 end

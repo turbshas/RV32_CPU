@@ -2,8 +2,12 @@ FILE_LIST:=\
 	decode/decode.sv \
 	../common/branch_compare/branch_compare.v \
 	../common/csr/csr.sv \
+	../common/decode/decode_branch_compare.sv \
 	../common/decode/decode_csr.sv \
+	../common/decode/decode_exec_unit.sv \
 	../common/decode/decode_imm_gen.sv \
+	../common/decode/decode_mem.sv \
+	../common/decode/deocde_write_back.sv \
 	../common/exec_unit/exec_unit.sv \
 	../common/fetch/fetch.v \
 	../common/imm_gen/imm_gen.sv \

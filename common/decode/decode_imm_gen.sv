@@ -5,7 +5,7 @@
 
 module decode_imm_gen
 (
-    input instr_packet instr,
+    input opcode_t opcode,
     output imm_type_t imm_type
 );
 

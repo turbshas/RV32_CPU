@@ -1,5 +1,7 @@
 `include "constants.sv"
 
+// TODO: should branch compare also determine the branch result?
+//       i.e. pass in the branch condition and compare with LT/EQ
 module branch_compare
 (
     input arch_reg rs1,
@@ -9,7 +11,7 @@ module branch_compare
     output logic equal /* 1 if rs1 == rs2 */
 );
 
-always @(*) begin
+always_comb begin
     if (unsigned_cmp)
         less_than = rs1 < rs2;
     else
