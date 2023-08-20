@@ -6,6 +6,7 @@
 `include "exec_unit_inc.sv"
 `include "imm_gen_inc.sv"
 `include "mem_inc.sv"
+`include "reg_file_inc.sv"
 
 module decode
 (
@@ -13,16 +14,15 @@ module decode
     input logic reset,
     input instr_packet instr,
 
-    output arch_reg_id rd,
-    output arch_reg_id rs1,
-    output arch_reg_id rs2,
+    output reg_file_read_params_t reg_file_read_params,
+    output reg_file_write_params_t reg_file_write_params,
+
     output imm_type_t imm_type,
     output exec_unit_params exec_params,
 
     input logic branch_result,
     output branch_compare_params_t branch_compare_params,
 
-    output logic reg_write_en,
     output write_back_select_t reg_store_sel,
     output logic pc_input_sel,
 
@@ -43,16 +43,8 @@ fence_instr_params fence_successor;
 // always block for picking out pieces of the instruction
 always_comb begin
     opcode = instr.opcode;
-    rd     = instr.params.r_instr.rd;
     funct3 = instr.params.r_instr.funct3;
-    rs2    = instr.params.r_instr.rs2;
     funct7 = instr.params.r_instr.funct7;
-
-    case (opcode)
-        // LUI makes rs1 need to be set to reg 0 - immediate gets added to 0.
-        OPCODE_LUI: rs1 = REGISTER_X0;
-        default: rs1 = instr.params.r_instr.rs1;
-    endcase
 
     // Fence-specific values
     fence_fm = instr.params.fence.fm;
@@ -61,8 +53,14 @@ always_comb begin
 end
 
 /* Reg/Immediate stage  */
+decode_reg_file decode_reg_file(
+    .instr(instr),
+    .params(reg_file_read_params)
+);
+
 decode_imm_gen decode_imm_gen(
     .opcode(opcode),
+    .funct3(funct3),
     .imm_type(imm_type)
 );
 
@@ -76,8 +74,8 @@ decode_exec_unit decode_exec_unit(
 /* Write-Back Stage  */
 decode_write_back decode_write_back(
     .reset(reset),
-    .opcode(opcode),
-    .reg_write_en(reg_write_en),
+    .instr(instr),
+    .reg_file_write_params(reg_file_write_params),
     .reg_store_sel(reg_store_sel)
 );
 

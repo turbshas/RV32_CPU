@@ -47,7 +47,8 @@ always_comb begin
         end
 
         // I-Type, S-Type, JALR, LUI (make sure rs1 is set to x0)
-        //5'b00100, 5'b01000, 5'11001, 5'b01101:
+        // Also, CSR instructions - they either use rs1 or an
+        // immediate so it needs to be sent through exec unit.
         default:
         begin
             exec_params.operand1_sel = OP1_SEL_REG;

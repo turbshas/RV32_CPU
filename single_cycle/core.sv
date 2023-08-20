@@ -56,18 +56,16 @@ fetch fetch_inst(
     .instr(instr)
 );
 
-arch_reg_id rd_addr, rs1_addr, rs2_addr;
+reg_file_read_params_t reg_file_read_params;
+reg_file_write_params_t reg_file_write_params;
 arch_reg rd_in, rs1_out, rs2_out;
-logic reg_file_WE;
 reg_file reg_file_inst(
     .clock(clock),
-    .addr_rs1(rs1_addr),
-    .addr_rs2(rs2_addr),
-    .addr_rd(rd_addr),
+    .read_params(reg_file_read_params),
+    .write_params(reg_file_write_params),
     .data_rd(rd_in),
     .data_rs1(rs1_out),
     .data_rs2(rs2_out),
-    .write_enable(reg_file_WE),
     .registers_out(registers)
 );
 
@@ -161,16 +159,15 @@ decode decode_inst(
     .reset(reset),
     .instr(instr),
 
-    .rd(rd_addr),
-    .rs1(rs1_addr),
-    .rs2(rs2_addr),
+    .reg_file_read_params(reg_file_read_params),
+    .reg_file_write_params(reg_file_write_params),
+
     .imm_type(imm_type),
     .exec_params(exec_params)
 
     .branch_result(branch_result),
     .branch_compare_params(branch_compare_params),
 
-    .reg_write_en(reg_file_WE),
     .reg_store_sel(write_back_sel),
     .pc_input_sel(pc_input_sel),
 

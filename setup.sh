@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -eox pipefail
 
 sudo apt install iverilog verilator yosys gtkwave npm
 sudo npm install -g netlistsvg
@@ -55,7 +55,8 @@ if ask "Would you like to install the riscv toolchain and tests? This will requi
     ./configure --prefix=$RISCV/tests --with-xlen=32
     RISCV_BIN=$RISCV/bin
     export PATH=$PATH:$RISCV_BIN
-    make
+    # The RISC-V benchmarks only support rv64, so just build the ISA tests.
+    make isa
 
     echo "Add the following directory to your path to use the toolchain:"
     echo "$RISCV_BIN"

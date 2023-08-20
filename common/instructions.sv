@@ -1,3 +1,4 @@
+`include "constants.sv"
 `include "fence_inc.sv"
 
 /*
@@ -63,12 +64,10 @@ typedef enum logic[6:0] {
     OPCODE_80b_INST =       {2'b11, 3'b111, 2'b11},
 } opcode_t;
 
-`define REGISTER_X0 5'b00000
-
-typedef logic[4:0] arch_reg_id;
+typedef logic[`REG_ADDR_WIDTH - 1:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
 typedef logic[6:0] funct7_t;
-typedef logic[31:0] arch_reg;
+typedef logic[(2 ** `REG_ADDR_WIDTH) - 1:0] arch_reg;
 
 // TODO: better place for this?
 typedef enum logic {

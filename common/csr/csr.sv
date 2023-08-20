@@ -32,7 +32,7 @@ reg[63:0] cycle_counter;
 reg[63:0] time_counter;
 reg[63:0] retired_instr_counter;
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset) begin
         cycle_counter = 64'h0;
     end else begin
@@ -40,7 +40,7 @@ always @(posedge clock) begin
     end
 end
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset) begin
         time_counter = 64'h0;
     end else begin
@@ -49,7 +49,7 @@ always @(posedge clock) begin
     end
 end
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset) begin
         retired_instr_counter = 64'h0;
     end else begin
@@ -59,7 +59,7 @@ always @(posedge clock) begin
     end
 end
 
-always @(*) begin
+always_comb begin
     if (read_csr) begin
         illegal_instr_exception = 0;
         case (csr_addr)
@@ -77,7 +77,7 @@ always @(*) begin
     end
 end
 
-always @(*) begin
+always_comb begin
     if (write_csr) begin
         if (csr_addr == `CSR_RDCYCLE || csr_addr == `CSR_RDCYCLEH
          || csr_addr == `CSR_RDTIME || csr_addr == `CSR_RDTIMEH
@@ -88,5 +88,11 @@ always @(*) begin
          end
     end
 end
+
+// internal signal for reading CSR
+// -> passed to read-set function (value | reg_in)
+// -> passed to read-clear function (value & ~reg_in)
+// always_comb block assigns from reg_in (RW), read-set (RS), and read-clear (RC) values
+//  - (or fires exception)
 
 endmodule

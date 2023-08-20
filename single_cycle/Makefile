@@ -7,6 +7,8 @@ FILE_LIST:=\
 	../common/decode/decode_exec_unit.sv \
 	../common/decode/decode_imm_gen.sv \
 	../common/decode/decode_mem.sv \
+	../common/decode/decode_pc_input_select.sv \
+	../common/decode/decode_reg_file.sv \
 	../common/decode/deocde_write_back.sv \
 	../common/exec_unit/exec_unit.sv \
 	../common/fetch/fetch.v \

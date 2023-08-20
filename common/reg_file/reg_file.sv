@@ -1,22 +1,21 @@
 `include "instructions.sv"
 
+`include "reg_file_inc.sv"
+
 module reg_file
-parameter REG_ADDR_WIDTH = 5;
 (
     input wire clock,
-    input wire[REG_ADDR_WIDTH - 1:0] addr_rs1,
-    input wire[REG_ADDR_WIDTH - 1:0] addr_rs2,
-    input wire[REG_ADDR_WIDTH - 1:0] addr_rd,
+    input reg_file_read_params_t read_params,
+    input reg_file_write_params_t write_params,
     input arch_reg data_rd,
     output arch_reg data_rs1,
     output arch_reg data_rs2,
-    input wire write_enable,
-    output arch_reg registers_out[2**REG_ADDR_WIDTH]
+    output arch_reg registers_out[2**`REG_ADDR_WIDTH]
 );
 
 logic dest_is_not_x0;
 logic valid_write;
-arch_reg registers[2**REG_ADDR_WIDTH];
+arch_reg registers[2**`REG_ADDR_WIDTH];
 assign registers_out = registers;
 
 `ifndef BUILDING_RTL
@@ -29,18 +28,18 @@ end
 `endif
 
 always_comb begin
-    data_rs1 = registers[addr_rs1];
-    data_rs2 = registers[addr_rs2];
-    dest_is_not_x0 = addr_rd != REG_ADDR_WIDTH'b0;
+    data_rs1 = registers[read_params.addr_rs1];
+    data_rs2 = registers[read_params.addr_rs2];
+    dest_is_not_x0 = write_params.addr_rd != `REG_ADDR_WIDTH'b0;
 end
 
 always_comb begin
-    valid_write = write_enable & dest_is_not_x0;
+    valid_write = write_params.write_enable & dest_is_not_x0;
 end
 
 always_ff @(posedge clock) begin
     if (valid_write) begin
-        registers[addr_rd] <= data_rd;
+        registers[write_params.addr_rd] <= data_rd;
     end
 end
 

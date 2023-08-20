@@ -44,8 +44,9 @@ always_comb begin
         IMM_S: immediate_out = S_immediate;
         IMM_B: immediate_out = B_immediate;
         IMM_U: immediate_out = U_immediate;
+        IMM_J: immediate_out = J_immediate;
         IMM_C: immediate_out = CSR_immediate;
-        default:  immediate_out = J_immediate;
+        default:  immediate_out = `REG_WIDTH'b0;
     endcase
 end
 

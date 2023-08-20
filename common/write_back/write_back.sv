@@ -7,7 +7,7 @@ module write_back
   input arch_reg pc_in,
   input write_back_select_t write_back_sel,
 
-  output reg [31:0] write_back_out
+  output arch_reg write_back_out
 );
 
 always_comb begin

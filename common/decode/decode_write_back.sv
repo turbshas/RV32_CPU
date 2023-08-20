@@ -6,27 +6,32 @@
 module decode_write_back
 (
     input logic reset,
-    input opcode_t opcode,
-    output logic reg_write_en,
+    input instr_packet instr,
+    output reg_file_write_params_t reg_file_write_params,
     output write_back_select_t reg_store_sel
 );
 
-// reg_write_en
+// reg file write enable
 always_comb begin
     if (reset)
-        reg_write_en = 0;
+        reg_file_write_params.write_enable = 0;
     else begin
-        case (opcode)
+        case (instr.opcode)
             // S-Type, B-Type
-            OPCODE_STORE, OPCODE_BRANCH: reg_write_en = 0;
-            default: reg_write_en = 1;
+            // TODO: CSR instructions need write enable on the reg file only if they are reading a CSR
+            OPCODE_STORE, OPCODE_BRANCH: reg_file_write_params.write_enable = 0;
+            default: reg_file_write_params.write_enable = 1;
         endcase
     end
 end
 
+always_comb begin
+    reg_file_write_params.addr_rd = instr.params.r_instr.rd;
+end
+
 // reg_store_sel, either takes ALU, MEM, or PC+4
 always_comb begin
-    case (opcode)
+    case (instr.opcode)
         // Loads
         OPCODE_LOAD: reg_store_sel = WRITE_BACK_SEL_MEM; // MEM
 

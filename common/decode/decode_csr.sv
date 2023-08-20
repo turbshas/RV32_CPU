@@ -29,8 +29,8 @@ logic read_dest_is_zero;
 logic write_source_is_zero;
 logic is_csr_instr;
 always_comb begin
-    read_dest_is_zero = system_params.rd == REGISTER_X0;
-    write_source_is_zero = system_params.rs1_or_uimm == REGISTER_X0;
+    read_dest_is_zero = system_params.rd == `REGISTER_X0;
+    write_source_is_zero = system_params.rs1_or_uimm == `REGISTER_X0;
     is_csr_instr = is_system_instr & write_func != CSR_WRITE_NONE;
 end
 
