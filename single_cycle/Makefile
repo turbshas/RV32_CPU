@@ -1,6 +1,6 @@
 FILE_LIST:=\
 	decode/decode.sv \
-	../common/branch_compare/branch_compare.v \
+	../common/branch_compare/branch_compare.sv \
 	../common/csr/csr.sv \
 	../common/decode/decode_branch_compare.sv \
 	../common/decode/decode_csr.sv \
@@ -13,9 +13,9 @@ FILE_LIST:=\
 	../common/exec_unit/exec_unit.sv \
 	../common/fetch/fetch.v \
 	../common/imm_gen/imm_gen.sv \
-	../common/mem/mem.v \
-	../common/reg_file/reg_file.v \
-	../common/write_back/write_back.v \
+	../common/mem/mem.sv \
+	../common/reg_file/reg_file.sv \
+	../common/write_back/write_back.sv \
 	core.sv
 
 INCLUDE_DIRS:=\
