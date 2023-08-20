@@ -2,7 +2,7 @@
 `include "instructions.sv"
 
 `include "csr_inc.sv"
-`include "exec_unit_interfaces.sv"
+`include "exec_unit_inc.sv"
 `include "imm_gen_inc.sv"
 
 module decode
@@ -62,19 +62,10 @@ always @(*) begin
 end
 
 /* Reg/Immediate stage  */
-always @(*) begin
-    case (opcode)
-        OPCODE_JALR:   imm_type = IMM_I;
-        OPCODE_LOAD:   imm_type = IMM_I;
-        OPCODE_OP_IMM: imm_type = IMM_I;
-        OPCODE_STORE:  imm_type = IMM_S;
-        OPCODE_BRANCH: imm_type = IMM_B;
-        OPCODE_LUI:    imm_type = IMM_U;
-        OPCODE_AUIPC:  imm_type = IMM_U;
-        OPCODE_JAL:    imm_type = IMM_J;
-        default:        imm_type = IMM_NONE;
-    endcase
-end
+decode_imm_gen decode_imm_gen(
+    .instr(instr),
+    .imm_type(imm_type)
+);
 
 /* Execute Stage  */
 
@@ -187,9 +178,10 @@ always @(*) begin
     end
 end
 
-always_comb begin
-    instr.system.
-end
+decode_csr decode_csr(
+    .instr(instr),
+    .csr_params(csr_params)
+);
 
 /* Memory stage */
 

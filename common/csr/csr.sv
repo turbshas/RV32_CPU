@@ -3,18 +3,13 @@
 module csr (
     input logic clock,
     input logic reset,
-    input logic instr_retired,
-    input priv_mode_t priv_mode,
+    input logic instr_retired, // TODO: idk? should this happen elsewhere?
+    input priv_mode_t priv_mode, // TODO: used to check if CSR address is allowed - NOTE: User CSRs always allowed
 
-    input csr_addr_t csr_addr,
-
-    input logic write_csr,
-    input csr_write_func write_function,
-    input arch_reg write_value,
-
-    input logic read_csr,
+    input arch_reg reg_in,
+    input csr_params params,
     output arch_reg read_value,
-
+    /** Can be either: requested CSR doesn't exist OR not allowed given current privilege level */
     output logic illegal_instr_exception
 );
 //TODO: move control logic to decode
@@ -54,7 +49,7 @@ always @(posedge clock) begin
     end
 end
 
-always @(posedge close) begin
+always @(posedge clock) begin
     if (reset) begin
         retired_instr_counter = 64'h0;
     end else begin

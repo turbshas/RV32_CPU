@@ -116,6 +116,22 @@ mem dmem(
     .setup_data_in(setup_data_in)
 );
 
+csr_params csr_params;
+arch_reg csr_out;
+logic csr_illegal_instr;
+csr csr(
+    .clock(clock),
+    .reset(reset),
+    instr_retired, // TODO: idk? should this happen elsewhere?
+    priv_mode, // TODO: used to check if CSR address is allowed - NOTE: User CSRs always allowed
+
+    .reg_in(exec_unit_out),
+    .params(csr_params),
+    .read_value(csr_out),
+    /** Can be either: requested CSR doesn't exist OR not allowed given current privilege level */
+    .illegal_instr_exception(csr_illegal_instr)
+);
+
 reg[1:0] write_back_sel;
 reg[31:0] write_back_out; // could change to rd_in directly
 assign rd_in = write_back_out;
@@ -129,6 +145,7 @@ write_back write_back_inst(
     // outputs
     .write_back_out(write_back_out)
 );
+
 // The WB stage consists more of just connecting to reg file, so most
 // of it can be done from this higher level, and the module exsits to 
 // implement a mux to determine which value to write back
@@ -137,20 +154,26 @@ decode decode_inst(
     .clock(clock),
     .reset(reset),
     .instr(instr),
+
     .branch_cmp_eq(branch_cmp_eq_out),
     .branch_cmp_lt(branch_cmp_lt_out),
+    .branch_cmp_unsigned(branch_cmp_unsigned_in),
+
     .reg_write_en(reg_file_WE),
     .reg_store_sel(write_back_sel),
     .rd(rd_addr),
     .rs1(rs1_addr),
     .rs2(rs2_addr),
+
     .imm_type(imm_type),
     .exec_params(exec_params)
+
     .pc_input_sel(pc_input_sel),
     .mem_r_w(dmem_RW),
     .mem_access_size(dmem_access_size),
     .mem_load_unsigned(dmem_load_unsigned),
-    .branch_cmp_unsigned(branch_cmp_unsigned_in)
+
+    .csr_params(csr_params)
 );
 
 assign pc_out = PC_out;
