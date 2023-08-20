@@ -20,12 +20,14 @@ logic s_sign;
 logic b_sign;
 logic j_sign;
 
-always @(*) begin
+always_comb begin
     i_sign = instr.i_instr.imm[11];
     s_sign = instr.s_instr.imm_b11to5[11];
     b_sign = instr.b_instr.imm_b12;
     j_sign = instr.j_instr.imm_b20;
+end
 
+always_comb begin
     I_immediate = { {20{i_sign}}, instr.i_instr.imm };
     S_immediate = { {20{s_sign}}, instr.s_instr.imm_b11to5, instr.s_instr.imm_b4to0 };
     B_immediate = { {20{b_sign}}, instr.b_instr.imm_b11, instr.b_instr.imm_b10to5, instr.b_instr.imm_b4to1, 1'b0 };
@@ -34,12 +36,12 @@ always @(*) begin
 end
 
 // always block for picking which immediate to use
-always @(*) begin
+always_comb begin
     case (imm_type)
-        `I_IMM_T: immediate_out = I_immediate;
-        `S_IMM_T: immediate_out = S_immediate;
-        `B_IMM_T: immediate_out = B_immediate;
-        `U_IMM_T: immediate_out = U_immediate;
+        IMM_I: immediate_out = I_immediate;
+        IMM_S: immediate_out = S_immediate;
+        IMM_B: immediate_out = B_immediate;
+        IMM_U: immediate_out = U_immediate;
         default:  immediate_out = J_immediate;
     endcase
 end

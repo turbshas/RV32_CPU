@@ -15,6 +15,7 @@ INCLUDE_DIRS:=\
 	-I../common/branch_compare \
 	-I../common/csr \
 	-I../common/exec_unit \
+	-I../common/fence \
 	-I../common/fetch \
 	-I../common/imm_gen \
 	-I../common/mem \

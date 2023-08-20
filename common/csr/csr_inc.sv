@@ -9,27 +9,20 @@
 `define WRITE_FUNC_RSVD1  3'b110
 `define WRITE_FUNC_RSVD2  3'b111
 
-`define CSR_RDCYCLE    12'h000
-`define CSR_RDCYCLEH   12'h001
-`define CSR_RDTIME     12'h002
-`define CSR_RDTIMEH    12'h003
-`define CSR_RDINSTRET  12'h004
-`define CSR_RDINSTRETH 12'h005
-
 typedef enum logic[1:0] {
-    CSR_READ_WRITE1 = 2'b00,
-    CSR_READ_WRITE2 = 2'b01,
-    CSR_READ_WRITE3 = 2'b10,
-    CSR_READ_ONLY = 2'b11,
+    CSR_ADDR_RW1 = 2'b00,
+    CSR_ADDR_RW2 = 2'b01,
+    CSR_ADDR_RW3 = 2'b10,
+    CSR_ADDR_RO  = 2'b11,
 } csr_addr_access;
 
 typedef enum logic[1:0] {
-    CSR_USER = 2'b00,
-    CSR_SUPERVISOR = 2'b01,
+    CSR_PRIV_USER = 2'b00,
+    CSR_PRIV_SUPERVISOR = 2'b01,
     /** Also permitted in Virtual Supervisor mode. */
-    CSR_HYPERVISOR = 2'b10,
+    CSR_PRIV_HYPERVISOR = 2'b10,
     /** A handful are also debug-only. */
-    CSR_MACHINE = 2'b11,
+    CSR_PRIV_MACHINE = 2'b11,
 } csr_addr_priv;
 
 typedef struct packed {
@@ -46,14 +39,32 @@ typedef struct packed {
  * CSRRW always writes, CSRRS and CSRRC always read (and cause side effects).
  */
 typedef enum logic[1:0] {
-    CSR_NONE = 2'b00,
+    CSR_WRITE_NONE = 2'b00,
     /** Read CSR -> store in RD, write RS1 to CSR. */
-    CSR_RW = 2'b01,
+    CSR_WRITE_RW = 2'b01,
     /** Read CSR -> store in RD, write (CSR | RS1) to CSR (sets bits). */
-    CSR_RS = 2'b10,
+    CSR_WRITE_RS = 2'b10,
     /** Read CSR -> store in RD, write (CSR & ~RS1) to CSR (clears bits). */
-    CSR_RC = 2'b11,
+    CSR_WRITE_RC = 2'b11,
 } csr_write_func;
+
+typedef enum logic {
+    CSR_SEL_RS1 = 1'b0,
+    CSR_SEL_IMM = 1'b1,
+} csr_input_sel;
+
+typedef struct packed {
+    csr_input_sel input_select;
+    csr_write_func write_func;
+} csr_funct3_t;
+
+typedef struct packed {
+    logic read_enable;
+    logic write_enable;
+    arch_reg write_value;
+    csr_input_sel input_select;
+    csr_write_func write_func;
+} csr_params;
 
 typedef struct packed {
     /** 0xF15 -> 0xFFF. */
