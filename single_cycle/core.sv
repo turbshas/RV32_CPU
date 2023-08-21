@@ -27,7 +27,7 @@ arch_reg PC_out;
 arch_reg imem_out;
 mem_params_t imem_params;
 always_comb begin
-    imem_params.load_unsigned = 1;
+    imem_params.read_unsigned = 1;
     imem_params.access_size = MEM_ACCESS_WORD;
     imem_params.op = MEM_OP_READ;
 end
@@ -48,7 +48,11 @@ mem imem(
 
 logic pc_input_sel;
 arch_reg new_PC_in;
-arch_reg instr;
+arch_reg raw_instr;
+instr_packet instr;
+always_comb begin
+    instr = raw_instr;
+end
 fetch fetch_inst(
     .clock(clock),
     .reset(reset),
@@ -57,7 +61,7 @@ fetch fetch_inst(
     .new_PC(new_PC_in),
     .stall_PC(),
     .PC_out(PC_out),
-    .instr(instr)
+    .instr(raw_instr)
 );
 
 reg_file_read_params_t reg_file_read_params;

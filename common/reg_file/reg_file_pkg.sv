@@ -1,6 +1,6 @@
-import instructions_pkg::arch_reg_id;
-
 package reg_file_pkg;
+
+import instructions_pkg::arch_reg_id;
 
 typedef struct packed {
     arch_reg_id addr_rs1;

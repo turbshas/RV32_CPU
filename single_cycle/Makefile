@@ -4,7 +4,6 @@ FILE_LIST:=\
 	../common/branch_compare/branch_compare_pkg.sv \
 	../common/csr/csr_pkg.sv \
 	../common/exec_unit/exec_unit_pkg.sv \
-	../common/fetch/fetch_pkg.sv \
 	../common/imm_gen/imm_gen_pkg.sv \
 	../common/mem/mem_pkg.sv \
 	../common/reg_file/reg_file_pkg.sv \

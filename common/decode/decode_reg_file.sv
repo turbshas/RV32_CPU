@@ -34,11 +34,11 @@ always_comb begin
     // LUI and CSRxxI instructions need rs1 need to be set to x0.
     // Both have their immediates added to 0.
     if (is_lui_instr | is_csri_instr)
-        params.rs1 = `REGISTER_X0;
+        params.addr_rs1 = `REGISTER_X0;
     else
-        params.rs1 = instr.params.r_instr.rs1;
+        params.addr_rs1 = instr.params.r_instr.rs1;
 
-    params.rs2 = instr.params.r_instr.rs2;
+    params.addr_rs2 = instr.params.r_instr.rs2;
 end
 
 endmodule

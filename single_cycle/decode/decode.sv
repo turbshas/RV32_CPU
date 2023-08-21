@@ -5,6 +5,8 @@ import instructions_pkg::funct7_t;
 import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
 import exec_unit_pkg::exec_unit_params;
+import fence_pkg::fence_access_ordering;
+import fence_pkg::fence_fm_t;
 import imm_gen_pkg::imm_type_t;
 import mem_pkg::mem_params_t;
 import reg_file_pkg::reg_file_read_params_t;
@@ -40,8 +42,8 @@ funct7_t funct7;
 
 // Memory Fence values
 reg[3:0] fence_fm;
-fence_instr_params fence_predecessor;
-fence_instr_params fence_successor;
+fence_access_ordering fence_predecessor;
+fence_access_ordering fence_successor;
 
 // always block for picking out pieces of the instruction
 always_comb begin
@@ -69,6 +71,7 @@ decode_imm_gen decode_imm_gen(
 
 /* Execute Stage  */
 decode_exec_unit decode_exec_unit(
+    .opcode(opcode),
     .funct3(funct3),
     .funct7(funct7),
     .params(exec_params)

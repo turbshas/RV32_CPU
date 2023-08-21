@@ -1,6 +1,6 @@
-import instructions_pkg::arch_reg;
-
 package csr_pkg;
+
+import instructions_pkg::arch_reg;
 
 typedef enum logic[1:0] {
     CSR_ADDR_RW1 = 2'b00,
@@ -56,11 +56,12 @@ typedef struct packed {
     logic write_enable;
     csr_input_sel input_select;
     csr_write_func write_func;
+    csr_addr_t addr;
 } csr_params_t;
 
 typedef struct packed {
     /** 0xF15 -> 0xFFF. */
-    arch_reg[234:0] rsvd16; // 0xEB
+    arch_reg[234:0] rsvd17; // 0xEB
 
     /** 0xF14 | MRO | Hardware Thread ID. */
     arch_reg mhartid;
@@ -72,7 +73,7 @@ typedef struct packed {
     arch_reg vendorid;
 
     /** 0xCA0 -> 0xF10. */
-    arch_reg[624:0] rsvd15; // 0x271
+    arch_reg[624:0] rsvd16; // 0x271
 
     /** 0xC83 -> 0xC9F | URO | High Performance Counters 3 -> 31, upper 32 bits. RV32I only */
     arch_reg hpmcounterh;
@@ -84,7 +85,7 @@ typedef struct packed {
     arch_reg cycleh;
 
     /** 0xC20 -> 0xC7F. */
-    arch_reg[95:0] rsvd14; // 0x60
+    arch_reg[95:0] rsvd15; // 0x60
 
     /** 0xC03 -> 0xC1F | URO | High Performance Counters 3 -> 31. */
     arch_reg[31:3] hpmcounter;
@@ -96,7 +97,7 @@ typedef struct packed {
     arch_reg cycle;
 
     /** 0xBA0 -> 0xBFF. */
-    arch_reg[95:0] rsvd13; // 0x60
+    arch_reg[95:0] rsvd14; // 0x60
 
     /** 0xB83 -> 0xB9F | MRW | Upper 32 bits of mhpmcounter registers (3 -> 31), RV32I only. */
     arch_reg[31:3] mhpmcounterh;
@@ -104,13 +105,13 @@ typedef struct packed {
     arch_reg minstreth;
 
     /** 0xB81. */
-    arch_reg rsvd12;
+    arch_reg rsvd13;
 
     /** 0xB80 | MRW | Upper 32 bits of mcycle, RV32I only. */
     arch_reg mcycleh;
 
     /** 0xB04 -> 0xB7F. */
-    arch_reg[123:0] rsvd11; // 0x7C
+    arch_reg[123:0] rsvd12; // 0x7C
 
     /** 0xB03 -> 0xB1F | MRW | Machine performance-monitoring counters (3 -> 31). */
     arch_reg[31:3] mhpmcounter;
@@ -118,7 +119,7 @@ typedef struct packed {
     arch_reg minstret;
 
     /** 0xB01. */
-    arch_reg rsvd9;
+    arch_reg rsvd11;
 
     /** 0xB00 | MRW | Machine cycle counter. */
     arch_reg mcycle;

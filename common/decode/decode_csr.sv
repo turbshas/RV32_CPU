@@ -3,6 +3,8 @@ import instructions_pkg::system_instr_params;
 import csr_pkg::csr_params_t;
 import csr_pkg::csr_funct3_t;
 import csr_pkg::csr_write_func;
+import csr_pkg::CSR_WRITE_NONE;
+import csr_pkg::CSR_WRITE_RW;
 import csr_pkg::csr_input_sel;
 
 // This is expected to be placed somewhere in writeback,

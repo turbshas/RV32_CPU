@@ -63,9 +63,9 @@ always_ff @(posedge clock) begin
 end
 
 always_comb begin
-    if (read_csr) begin
+    if (params.read_enable) begin
         illegal_instr_exception = 0;
-        case (csr_addr)
+        case (params.addr)
             /* TODO: gotta figure out CSR accessing
             `CSR_RDCYCLE:    read_value = cycle_counter[31:0];
             `CSR_RDCYCLEH:   read_value = cycle_counter[63:32];
@@ -83,7 +83,7 @@ always_comb begin
 end
 
 always_comb begin
-    if (write_csr) begin
+    if (params.write_enable) begin
         /*
         if (csr_addr == `CSR_RDCYCLE || csr_addr == `CSR_RDCYCLEH
          || csr_addr == `CSR_RDTIME || csr_addr == `CSR_RDTIMEH
