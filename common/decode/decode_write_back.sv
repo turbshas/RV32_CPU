@@ -1,6 +1,13 @@
 import instructions_pkg::instr_packet;
-import write_back_pkg::reg_file_write_params_t;
+import instructions_pkg::OPCODE_STORE;
+import instructions_pkg::OPCODE_BRANCH;
+import instructions_pkg::OPCODE_LOAD;
+import instructions_pkg::OPCODE_JALR;
+import reg_file_pkg::reg_file_write_params_t;
 import write_back_pkg::write_back_select_t;
+import write_back_pkg::WRITE_BACK_SEL_ALU;
+import write_back_pkg::WRITE_BACK_SEL_MEM;
+import write_back_pkg::WRITE_BACK_SEL_PC;
 
 module decode_write_back
 (

@@ -1,32 +1,9 @@
 import instructions_pkg::arch_reg;
-
-package branch_compare_pkg;
-
-typedef enum logic[1:0] {
-    BRANCH_COND_EQ = 2'b00,
-    BRANCH_COND_NE = 2'b01,
-    BRANCH_COND_LT = 2'b10,
-    BRANCH_COND_GE = 2'b11
-} branch_cond_t;
-
-typedef struct packed {
-    logic unsigned_cmp;
-    branch_cond_t branch_cond;
-} branch_compare_params_t;
-
-typedef enum logic[1:0] {
-    BRANCH_COND_EQ = 2'b00,
-    BRANCH_COND_NE = 2'b01,
-    BRANCH_COND_LT = 2'b10,
-    BRANCH_COND_GE = 2'b11
-} branch_cond_t;
-
-typedef struct packed {
-    logic unsigned_cmp;
-    branch_cond_t branch_cond;
-} branch_compare_params_t;
-
-endpackage
+import branch_compare_pkg::branch_compare_params_t;
+import branch_compare_pkg::BRANCH_COND_EQ;
+import branch_compare_pkg::BRANCH_COND_NE;
+import branch_compare_pkg::BRANCH_COND_LT;
+import branch_compare_pkg::BRANCH_COND_GE;
 
 module branch_compare
 (

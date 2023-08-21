@@ -1,5 +1,8 @@
 import instructions_pkg::instr_packet;
+import instructions_pkg::OPCODE_LUI;
+import instructions_pkg::OPCODE_SYSTEM;
 import csr_pkg::csr_funct3_t;
+import csr_pkg::CSR_SEL_IMM;
 import reg_file_pkg::reg_file_read_params_t;
 
 module decode_reg_file
@@ -28,15 +31,14 @@ always_comb begin
 end
 
 always_comb begin
-    rd     = instr.params.r_instr.rd;
-    rs2    = instr.params.r_instr.rs2;
-
     // LUI and CSRxxI instructions need rs1 need to be set to x0.
     // Both have their immediates added to 0.
     if (is_lui_instr | is_csri_instr)
-        rs1 = `REGISTER_X0;
+        params.rs1 = `REGISTER_X0;
     else
-        rs1 = instr.params.r_instr.rs1;
+        params.rs1 = instr.params.r_instr.rs1;
+
+    params.rs2 = instr.params.r_instr.rs2;
 end
 
 endmodule

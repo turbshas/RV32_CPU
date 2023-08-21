@@ -1,6 +1,16 @@
+import instructions_pkg::OPCODE_OP;
+import instructions_pkg::OPCODE_OP_IMM;
+import instructions_pkg::OPCODE_BRANCH;
+import instructions_pkg::OPCODE_JAL;
+import instructions_pkg::OPCODE_AUIPC;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
 import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::OP1_SEL_REG;
+import exec_unit_pkg::OP1_SEL_PC;
+import exec_unit_pkg::OP2_SEL_REG;
+import exec_unit_pkg::OP2_SEL_IMM;
+import exec_unit_pkg::EXEC_OP_ADD;
 
 module decode_exec_unit
 (

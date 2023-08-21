@@ -1,4 +1,5 @@
 import instructions_pkg::opcode_t;
+import instructions_pkg::OPCODE_STORE;
 import instructions_pkg::funct3_t;
 import mem_pkg::mem_params_t;
 

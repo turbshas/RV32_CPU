@@ -1,5 +1,10 @@
 import instructions_pkg::opcode_t;
+import instructions_pkg::OPCODE_BRANCH;
+import instructions_pkg::OPCODE_JAL;
+import instructions_pkg::OPCODE_JALR;
 import instructions_pkg::pc_input_sel_t;
+import instructions_pkg::PC_INPUT_ALU;
+import instructions_pkg::PC_INPUT_PC_PLUS_4;
 
 module decode_pc_input_select
 (

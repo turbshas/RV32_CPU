@@ -1,15 +1,8 @@
 import instructions_pkg::arch_reg;
-
-package write_back_pkg;
-
-typedef enum logic[1:0] {
-    WRITE_BACK_SEL_MEM  = 2'b00,
-    WRITE_BACK_SEL_ALU  = 2'b01,
-    WRITE_BACK_SEL_PC   = 2'b10,
-    WRITE_BACK_SEL_RSVD = 2'b11
-} write_back_select_t;
-
-endpackage
+import write_back_pkg::write_back_select_t;
+import write_back_pkg::WRITE_BACK_SEL_ALU;
+import write_back_pkg::WRITE_BACK_SEL_MEM;
+import write_back_pkg::WRITE_BACK_SEL_PC;
 
 module write_back 
 (

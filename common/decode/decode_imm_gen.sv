@@ -1,7 +1,24 @@
 import instructions_pkg::opcode_t;
+import instructions_pkg::OPCODE_JALR;
+import instructions_pkg::OPCODE_LOAD;
+import instructions_pkg::OPCODE_OP_IMM;
+import instructions_pkg::OPCODE_STORE;
+import instructions_pkg::OPCODE_BRANCH;
+import instructions_pkg::OPCODE_LUI;
+import instructions_pkg::OPCODE_AUIPC;
+import instructions_pkg::OPCODE_JAL;
+import instructions_pkg::OPCODE_SYSTEM;
 import instructions_pkg::funct3_t;
 import csr_pkg::csr_funct3_t;
+import csr_pkg::CSR_SEL_IMM;
 import imm_gen_pkg::imm_type_t;
+import imm_gen_pkg::IMM_I;
+import imm_gen_pkg::IMM_S;
+import imm_gen_pkg::IMM_B;
+import imm_gen_pkg::IMM_U;
+import imm_gen_pkg::IMM_J;
+import imm_gen_pkg::IMM_C;
+import imm_gen_pkg::IMM_NONE;
 
 module decode_imm_gen
 (
