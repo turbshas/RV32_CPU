@@ -63,11 +63,11 @@ typedef struct packed {
     logic write_enable;
     csr_input_sel input_select;
     csr_write_func write_func;
-} csr_params;
+} csr_params_t;
 
 typedef struct packed {
     /** 0xF15 -> 0xFFF. */
-    arch_reg rsvd16[235]; // 0xEB
+    arch_reg[234:0] rsvd16; // 0xEB
 
     /** 0xF14 | MRO | Hardware Thread ID. */
     arch_reg mhartid;
@@ -79,7 +79,7 @@ typedef struct packed {
     arch_reg vendorid;
 
     /** 0xCA0 -> 0xF10. */
-    arch_reg rsvd15[625]; // 0x271
+    arch_reg[624:0] rsvd15; // 0x271
 
     /** 0xC83 -> 0xC9F | URO | High Performance Counters 3 -> 31, upper 32 bits. RV32I only */
     arch_reg hpmcounterh;
@@ -91,22 +91,22 @@ typedef struct packed {
     arch_reg cycleh;
 
     /** 0xC20 -> 0xC7F. */
-    arch_reg rsvd14[96]; // 0x60
+    arch_reg[95:0] rsvd14; // 0x60
 
     /** 0xC03 -> 0xC1F | URO | High Performance Counters 3 -> 31. */
-    arch_reg hpmcounter[29];
+    arch_reg[31:3] hpmcounter;
     /** 0xC02 | URO | Instructions-retired counter for RDINSTRET instruction. */
     arch_reg instret;
     /** 0xC01 | URO | Timer for RDTIME instruction. */
-    arch_reg time;
+    arch_reg timer;
     /** 0xC00 | URO | Cycle counter for RDCYCLE instruction. */
     arch_reg cycle;
 
     /** 0xBA0 -> 0xBFF. */
-    arch_reg rsvd13[96]; // 0x60
+    arch_reg[95:0] rsvd13; // 0x60
 
     /** 0xB83 -> 0xB9F | MRW | Upper 32 bits of mhpmcounter registers (3 -> 31), RV32I only. */
-    arch_reg mhpmcounterh[29];
+    arch_reg[31:3] mhpmcounterh;
     /** 0xB82 | MRW | Upper 32 bits of minstret, RV32I only. */
     arch_reg minstreth;
 
@@ -117,10 +117,10 @@ typedef struct packed {
     arch_reg mcycleh;
 
     /** 0xB04 -> 0xB7F. */
-    arch_reg rsvd11[124]; // 0x7C
+    arch_reg[123:0] rsvd11; // 0x7C
 
     /** 0xB03 -> 0xB1F | MRW | Machine performance-monitoring counters (3 -> 31). */
-    arch_reg mhpmcounter[29];
+    arch_reg[31:3] mhpmcounter;
     /** 0xB02 | MRW | Machine instructions-retired counter. */
     arch_reg minstret;
 
@@ -131,31 +131,31 @@ typedef struct packed {
     arch_reg mcycle;
 
     /** 0x7B4 -> 0xAFF. */
-    arch_reg rsvd10[844]; // 0x34C
+    arch_reg[843:0] rsvd10; // 0x34C
 
     /** 0x7B2 -> 0x7B3 | DRW | Debug scratch registers (0 -> 1). */
-    arch_reg dscratch[2];
+    arch_reg[1:0] dscratch;
     /** 0x7B1 | DRW | Debug PC. */
     arch_reg dpc;
     /** 0x7B0 | DRW | Debug control and status register. */
     arch_reg dcsr;
 
     /** 0x7A4 -> 0x7AF. */
-    arch_reg rsvd9[12]; // 0x00C
+    arch_reg[11:0] rsvd9; // 0x00C
 
     /** 0x7A1 -> 0x7A3 | MRW | Debug/Trace trigger data registers (1 -> 3). */
-    arch_reg tdata[3];
+    arch_reg[2:0] tdata;
     /** 0x7A0 | MRW | Debug/Trace trigger register select. */
     arch_reg tselect;
 
     /** 0x3B1 -> 0x79F. */
-    arch_reg rsvd8[1007]; // 0x3EF
+    arch_reg[1006:0] rsvd8; // 0x3EF
 
     /** 0x3B0 -> 0x3BF | MRW | Physical memory protection address registers 0 -> 15. */
-    arch_reg pmpaddr[16];
+    arch_reg[15:0] pmpaddr;
 
     /** 0x3A1 -> 0x3AF. */
-    arch_reg rsvd7[15]; // 0x00F
+    arch_reg[14:0] rsvd7; // 0x00F
 
     /** 0x3A0 | MRW | Physical memory protection configuration. RV32 only. */
     arch_reg pmpcfg3;
@@ -167,7 +167,7 @@ typedef struct packed {
     arch_reg pmpcfg0;
 
     /** 0x345 -> 0x39F. */
-    arch_reg rsvd6[89]; // 0x059
+    arch_reg[88:0] rsvd6; // 0x059
 
     /** 0x344 | MRW | Machine interrupt pending. */
     arch_reg mip;
@@ -181,13 +181,13 @@ typedef struct packed {
     arch_reg mscratch;
 
     /** 0x323 -> 0x33F | MRW | Machine performance-monitoring event selector. */
-    arch_reg mhpevent[29];
+    arch_reg[31:3] mhpevent;
 
     /** 0x320 | MRW | Machine counter-inhibit register. */
     arch_reg mcountinhibit;
 
     /** 0x307 -> 0x33F. */
-    arch_reg rsvd5[57]; // 0x039
+    arch_reg[56:0] rsvd5; // 0x039
 
     /** 0x306 | MRW | Machine counter enable. */
     arch_reg mcounteren;
@@ -205,7 +205,7 @@ typedef struct packed {
     arch_reg mstatus;
 
     /** 0x181 -> 0x2FF. */
-    arch_reg rsvd4[383]; // 0x17F
+    arch_reg[382:0] rsvd4; // 0x17F
 
     /** 0x180 | SRW | Supervisor address translation and protection. */
     arch_reg satp;
@@ -237,7 +237,7 @@ typedef struct packed {
     arch_reg sstatus;
 
     /** 0x045 -> 0x0FF. */
-    arch_reg rsvd2[187]; // 0x0BB
+    arch_reg[186:0] rsvd2; // 0x0BB
 
     /** 0x044 | URW | User Interrupt Pending. */
     arch_reg uip;
@@ -250,7 +250,7 @@ typedef struct packed {
     /** 0x040 | URW | Scratch register for user trap handlers. */
     arch_reg uscratch;
     /** 0x006 -> 0x3F. */
-    arch_reg rsvd1[53]; // 0x35
+    arch_reg[52:0] rsvd1; // 0x35
     /** 0x005 | URW | User trap handler base address. */
     arch_reg utvec;
     /** 0x004 | URW | User interrupt-enable register. */

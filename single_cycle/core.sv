@@ -120,7 +120,7 @@ mem dmem(
     .setup_data_in(setup_data_in)
 );
 
-csr_params csr_params;
+csr_params_t csr_params;
 arch_reg csr_out;
 logic csr_illegal_instr;
 csr csr(

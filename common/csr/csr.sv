@@ -7,7 +7,7 @@ module csr (
     input priv_mode_t priv_mode, // TODO: used to check if CSR address is allowed - NOTE: User CSRs always allowed
 
     input arch_reg reg_in,
-    input csr_params params,
+    input csr_params_t params,
     output arch_reg read_value,
     /** Can be either: requested CSR doesn't exist OR not allowed given current privilege level */
     output logic illegal_instr_exception

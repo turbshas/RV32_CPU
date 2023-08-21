@@ -27,7 +27,7 @@ module decode
     output logic pc_input_sel,
 
     output mem_params_t mem_params,
-    output csr_params csr_params
+    output csr_params_t csr_params
 );
 
 // R-type values

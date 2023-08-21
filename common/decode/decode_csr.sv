@@ -8,7 +8,7 @@
 module decode_csr
 (
     input instr_packet instr,
-    output csr_params csr_params
+    output csr_params_t csr_params
 );
 
 logic is_system_instr;
