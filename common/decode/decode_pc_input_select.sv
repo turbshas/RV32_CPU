@@ -1,4 +1,3 @@
-`include "constants.sv"
 `include "instructions.sv"
 
 module decode_pc_input_select

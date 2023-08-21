@@ -1,6 +1,6 @@
-`include "constants.sv"
 `include "instructions.sv"
 
+`include "csr_inc.sv"
 `include "imm_gen_inc.sv"
 
 module decode_imm_gen

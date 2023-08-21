@@ -137,15 +137,13 @@ typedef struct packed {
     arch_reg_id rd;
 } j_instr_params;
 
-`include "csr_inc.sv"
-
 typedef struct packed {
     /** [11:10] = access (R/W or R/O), [9:8] = privilege (U/S/H/M). */
     logic[11:0] csr_addr;
     /** Unsigned immediate - always zero sign extended. */
     arch_reg_id rs1_or_uimm;
     /** CSR write function - 000 for other system operations (e.g. ECALL/EBREAK). */
-    csr_funct3_t csr_funct3;
+    funct3_t funct3;
     arch_reg_id rd;
 } system_instr_params;
 

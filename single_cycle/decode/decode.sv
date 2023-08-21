@@ -1,4 +1,3 @@
-`include "constants.sv"
 `include "instructions.sv"
 
 `include "branch_compare_inc.sv"

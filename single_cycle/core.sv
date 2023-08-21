@@ -1,4 +1,3 @@
-`include "constants.sv"
 `include "instructions.sv"
 
 `include "branch_compare_inc.sv"
@@ -6,6 +5,7 @@
 `include "exec_unit_inc.sv"
 `include "imm_gen_inc.sv"
 `include "mem_inc.sv"
+`include "reg_file_inc.sv"
 
 module core
 (
@@ -34,7 +34,7 @@ mem imem(
     .address(PC_out),
     .data_in(),
     .data_out(imem_out),
-    .params(imem_params)
+    .params(imem_params),
 
     /* Setup stuff for tests */
     .setup_write(setup_write),
@@ -96,7 +96,7 @@ exec_unit exec_unit_inst(
     .rs1(rs1_out),
     .rs2(rs2_out),
     .imm_val(imm_out),
-    .params(exec_params)
+    .params(exec_params),
 
     // outputs
     .exec_out(exec_unit_out)
@@ -163,7 +163,7 @@ decode decode_inst(
     .reg_file_write_params(reg_file_write_params),
 
     .imm_type(imm_type),
-    .exec_params(exec_params)
+    .exec_params(exec_params),
 
     .branch_result(branch_result),
     .branch_compare_params(branch_compare_params),

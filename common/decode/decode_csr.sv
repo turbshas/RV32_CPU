@@ -1,4 +1,3 @@
-`include "constants.sv"
 `include "instructions.sv"
 
 `include "csr_inc.sv"
@@ -13,16 +12,18 @@ module decode_csr
 
 logic is_system_instr;
 system_instr_params system_params;
+csr_funct3_t csr_funct3;
 always_comb begin
     is_system_instr = instr.opcode == OPCODE_SYSTEM;
     system_params = instr.params.system;
+    csr_funct3 = instr.params.system.funct3;
 end
 
 csr_write_func write_func;
 csr_input_sel write_select;
 always_comb begin
-    write_func = system_params.csr_funct3.write_func;
-    write_select = system_params.csr_funct3.input_select;
+    write_func = csr_funct3.write_func;
+    write_select = csr_funct3.input_select;
 end
 
 logic read_dest_is_zero;
@@ -41,7 +42,7 @@ always_comb begin
     csr_params.write_enable = is_csr_instr & (write_func == CSR_WRITE_RW | !write_source_is_zero);
 
     csr_params.input_select = write_select;
-    csr_params.write_func = system_params.csr_funct3.write_func;
+    csr_params.write_func = csr_funct3.write_func;
 end
 
 endmodule

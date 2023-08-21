@@ -1,4 +1,3 @@
-`include "constants.sv"
 `include "instructions.sv"
 
 `include "exec_unit_inc.sv"

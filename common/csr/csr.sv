@@ -81,6 +81,7 @@ end
 
 always_comb begin
     if (write_csr) begin
+        /*
         if (csr_addr == `CSR_RDCYCLE || csr_addr == `CSR_RDCYCLEH
          || csr_addr == `CSR_RDTIME || csr_addr == `CSR_RDTIMEH
          || csr_addr == `CSR_RDINSTRET || csr_addr == `CSR_RDINSTRETH) begin
@@ -88,6 +89,7 @@ always_comb begin
          end else begin
              illegal_instr_exception = 0;
          end
+         */
     end
 end
 

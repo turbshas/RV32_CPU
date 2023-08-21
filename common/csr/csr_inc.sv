@@ -1,5 +1,3 @@
-`include "constants.sv"
-
 `define WRITE_FUNC_CSRRW  3'b000
 `define WRITE_FUNC_CSRRS  3'b001
 `define WRITE_FUNC_CSRRC  3'b010

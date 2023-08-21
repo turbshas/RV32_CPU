@@ -8,7 +8,7 @@ SIMFILE:=$(OUTPUT_NAME).vvp
 TRACEFILE:=$(OUTPUT_NAME).vcd
 
 $(SIMFILE): $(FILE_LIST)
-	iverilog -g2005 -s $(TOPMODULE) -DDUMPFILE=\"$(TRACEFILE)\" -o $(SIMFILE) $^
+	iverilog -g2005 -s -u $(TOPMODULE) -DDUMPFILE=\"$(TRACEFILE)\" -o $(SIMFILE) $^
 
 $(TRACEFILE): $(SIMFILE)
 	./$<

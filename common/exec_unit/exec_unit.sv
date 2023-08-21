@@ -1,5 +1,5 @@
-`include "constants.sv"
-`include "exec_unt_interfaces.sv"
+`include "instructions.sv"
+`include "exec_unit_inc.sv"
 
 // here is the higher level module for instancing the alu and branch compare
 // modules and fascilitating their connections

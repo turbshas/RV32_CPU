@@ -1,6 +1,6 @@
-`include "constants.sv"
 `include "instructions.sv"
 
+`include "csr_inc.sv"
 `include "reg_file_inc.sv"
 
 module decode_reg_file
@@ -9,13 +9,18 @@ module decode_reg_file
     output reg_file_read_params_t params
 );
 
+csr_funct3_t csr_funct3;
+always_comb begin
+    csr_funct3 = instr.params.system.funct3;
+end
+
 logic is_lui_instr;
 logic is_system_instr;
 logic is_csr_imm_input;
 always_comb begin
     is_lui_instr = instr.opcode == OPCODE_LUI;
     is_system_instr = instr.opcode == OPCODE_SYSTEM;
-    is_csr_imm_input = instr.system.csr_funct3.input_select == CSR_SEL_IMM;
+    is_csr_imm_input = csr_funct3.input_select == CSR_SEL_IMM;
 end
 
 logic is_csri_instr;
