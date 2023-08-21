@@ -1,11 +1,11 @@
 typedef enum logic {
     OP1_SEL_REG = 1'b0,
-    OP1_SEL_PC = 1'b1,
+    OP1_SEL_PC = 1'b1
 } op1_select_t;
 
 typedef enum logic {
     OP2_SEL_REG = 1'b0,
-    OP2_SEL_IMM = 1'b1,
+    OP2_SEL_IMM = 1'b1
 } op2_select_t;
 
 typedef enum logic[3:0] {
@@ -24,16 +24,16 @@ typedef enum logic[3:0] {
     EXEC_OP_SLTU_SLTIU1 = 4'b0011,
     EXEC_OP_SLTU_SLTIU2 = 4'b1011,
 
-    EXEC_OP_XOR1        = 4'b0100
-    EXEC_OP_XOR2        = 4'b1100
+    EXEC_OP_XOR1        = 4'b0100,
+    EXEC_OP_XOR2        = 4'b1100,
 
-    EXEC_OP_SRL_SRLI    = 4'b0101 // Shift right logical (Do not extend sign down)
-    EXEC_OP_SRA_SRAI    = 4'b1101 // Shift right arithmetic
+    EXEC_OP_SRL_SRLI    = 4'b0101, // Shift right logical (Do not extend sign down)
+    EXEC_OP_SRA_SRAI    = 4'b1101, // Shift right arithmetic
 
-    EXEC_OP_OR1         = 4'b0110
-    EXEC_OP_OR2         = 4'b1110
+    EXEC_OP_OR1         = 4'b0110,
+    EXEC_OP_OR2         = 4'b1110,
 
-    EXEC_OP_AND1        = 4'b0111
+    EXEC_OP_AND1        = 4'b0111,
     EXEC_OP_AND2        = 4'b1111
 } exec_op_t;
 

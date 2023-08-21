@@ -20,6 +20,7 @@ FILE_LIST:=\
 
 INCLUDE_DIRS:=\
 	-I. \
+	-I../common \
 	-I../common/branch_compare \
 	-I../common/csr \
 	-I../common/exec_unit \

@@ -12,5 +12,5 @@ typedef enum logic[2:0] {
     /** CSR instructions. */
     IMM_C = 3'b101,
     IMM_RSV = 3'b110,
-    IMM_NONE = 3'b111,
+    IMM_NONE = 3'b111
 } imm_type_t;

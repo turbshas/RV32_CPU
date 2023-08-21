@@ -61,7 +61,7 @@ typedef enum logic[6:0] {
     OPCODE_RSVD2 =          {2'b11, 3'b101, 2'b11},
     OPCODE_CUSTOM3_RV128 =  {2'b11, 3'b110, 2'b11},
 
-    OPCODE_80b_INST =       {2'b11, 3'b111, 2'b11},
+    OPCODE_80b_INST =       {2'b11, 3'b111, 2'b11}
 } opcode_t;
 
 typedef logic[`REG_ADDR_WIDTH - 1:0] arch_reg_id;
@@ -72,7 +72,7 @@ typedef logic[(2 ** `REG_ADDR_WIDTH) - 1:0] arch_reg;
 // TODO: better place for this?
 typedef enum logic {
     PC_INPUT_PC_PLUS_4 = 1'b0,
-    PC_INPUT_ALU = 1'b1,
+    PC_INPUT_ALU = 1'b1
 } pc_input_sel_t;
 
 typedef struct packed {

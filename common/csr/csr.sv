@@ -1,4 +1,4 @@
-`include "csr_inc.v"
+`include "csr_inc.sv"
 
 module csr (
     input logic clock,
@@ -63,6 +63,7 @@ always_comb begin
     if (read_csr) begin
         illegal_instr_exception = 0;
         case (csr_addr)
+            /* TODO: gotta figure out CSR accessing
             `CSR_RDCYCLE:    read_value = cycle_counter[31:0];
             `CSR_RDCYCLEH:   read_value = cycle_counter[63:32];
             `CSR_RDTIME:     read_value = time_counter[31:0];
@@ -70,6 +71,7 @@ always_comb begin
             `CSR_RDINSTRET:  read_value = retired_instr_counter[31:0];
             `CSR_RDINSTRETH: read_value = retired_instr_counter[63:32];
             `default: illegal_instr_exception = 1;
+            */
         endcase
     end else begin
         read_value = 32'h0;

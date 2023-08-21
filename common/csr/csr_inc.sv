@@ -13,7 +13,7 @@ typedef enum logic[1:0] {
     CSR_ADDR_RW1 = 2'b00,
     CSR_ADDR_RW2 = 2'b01,
     CSR_ADDR_RW3 = 2'b10,
-    CSR_ADDR_RO  = 2'b11,
+    CSR_ADDR_RO  = 2'b11
 } csr_addr_access;
 
 typedef enum logic[1:0] {
@@ -22,7 +22,7 @@ typedef enum logic[1:0] {
     /** Also permitted in Virtual Supervisor mode. */
     CSR_PRIV_HYPERVISOR = 2'b10,
     /** A handful are also debug-only. */
-    CSR_PRIV_MACHINE = 2'b11,
+    CSR_PRIV_MACHINE = 2'b11
 } csr_addr_priv;
 
 typedef struct packed {
@@ -45,12 +45,12 @@ typedef enum logic[1:0] {
     /** Read CSR -> store in RD, write (CSR | RS1) to CSR (sets bits). */
     CSR_WRITE_RS = 2'b10,
     /** Read CSR -> store in RD, write (CSR & ~RS1) to CSR (clears bits). */
-    CSR_WRITE_RC = 2'b11,
+    CSR_WRITE_RC = 2'b11
 } csr_write_func;
 
 typedef enum logic {
     CSR_SEL_RS1 = 1'b0,
-    CSR_SEL_IMM = 1'b1,
+    CSR_SEL_IMM = 1'b1
 } csr_input_sel;
 
 typedef struct packed {
