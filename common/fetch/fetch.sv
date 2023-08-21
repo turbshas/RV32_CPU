@@ -1,6 +1,6 @@
 import instructions_pkg::arch_reg;
 
-package fetch_pkg
+package fetch_pkg;
 
 module fetch
 (

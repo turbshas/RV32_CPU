@@ -20,7 +20,7 @@ import mem_pkg::mem;
 import reg_file_pkg::reg_file;
 import write_back_pkg::write_back;
 
-package core_pkg
+package core_pkg;
 
 module core
 (

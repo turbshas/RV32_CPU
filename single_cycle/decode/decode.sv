@@ -20,7 +20,7 @@ import decode_pc_input_select_pkg::decode_pc_input_select;
 import decode_reg_file_pkg::decode_reg_file;
 import decode_write_back_pkg::decode_write_back;
 
-package decode_pkg
+package decode_pkg;
 
 module decode
 (

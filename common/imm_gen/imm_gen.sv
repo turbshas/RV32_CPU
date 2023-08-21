@@ -1,7 +1,7 @@
 import instructions_pkg::arch_reg;
 import instructions_pkg::instr_params;
 
-package imm_gen_pkg
+package imm_gen_pkg;
 
 typedef enum logic[2:0] {
     /** I-type instructions. */

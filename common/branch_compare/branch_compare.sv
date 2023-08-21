@@ -1,6 +1,6 @@
 import instructions_pkg::arch_reg;
 
-package branch_compare_pkg
+package branch_compare_pkg;
 
 typedef enum logic[1:0] {
     BRANCH_COND_EQ = 2'b00,

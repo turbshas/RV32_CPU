@@ -2,7 +2,7 @@ import instructions_pkg::opcode_t;
 import instructions_pkg::funct3_t;
 import mem_pkg::mem_params_t;
 
-package decode_mem_pkg
+package decode_mem_pkg;
 
 module decode_mem
 (

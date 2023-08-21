@@ -1,7 +1,7 @@
 import instructions_pkg::arch_reg;
 import instructions_pkg::priv_mode_t;
 
-package csr_pkg
+package csr_pkg;
 
 typedef enum logic[1:0] {
     CSR_ADDR_RW1 = 2'b00,

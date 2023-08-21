@@ -3,7 +3,7 @@ import instructions_pkg::arch_reg;
 `define MEM_SIZE (64*1024*1024)
 `define TEMP_SIZE (4096)
 
-package mem_pkg
+package mem_pkg;
 
 typedef enum logic {
     MEM_OP_WRITE = 1'b0,

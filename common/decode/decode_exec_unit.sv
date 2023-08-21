@@ -2,7 +2,7 @@ import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
 import exec_unit_pkg::exec_unit_params;
 
-package decode_exec_unit_pkg
+package decode_exec_unit_pkg;
 
 module decode_exec_unit
 (

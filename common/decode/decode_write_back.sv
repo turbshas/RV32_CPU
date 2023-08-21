@@ -2,7 +2,7 @@ import instructions_pkg::instr_packet;
 import write_back_pkg::reg_file_write_params_t;
 import write_back_pkg::write_back_select_t;
 
-package decode_write_back_pkg
+package decode_write_back_pkg;
 
 module decode_write_back
 (

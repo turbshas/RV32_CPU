@@ -3,7 +3,7 @@ import instructions_pkg::funct3_t;
 import csr_pkg::csr_funct3_t;
 import imm_gen_pkg::imm_type_t;
 
-package decode_imm_gen_pkg
+package decode_imm_gen_pkg;
 
 module decode_imm_gen
 (

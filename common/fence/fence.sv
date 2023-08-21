@@ -1,4 +1,4 @@
-package fence_pkg
+package fence_pkg;
 
 // Values for FENCE fm field - all other values reserved.
 typedef enum logic[3:0] {

@@ -3,7 +3,7 @@
 import fence_pkg::fence_fm_t;
 import fence_pkg::fence_access_ordering;
 
-package instructions_pkg
+package instructions_pkg;
 /*
 Main instruction types:
         31                25 24       20 19            15 14                            12 11              7 6         0

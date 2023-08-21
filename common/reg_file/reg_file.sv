@@ -1,7 +1,7 @@
 import instructions_pkg::arch_reg_id;
 import instructions_pkg::arch_reg;
 
-package reg_file_pkg
+package reg_file_pkg;
 
 typedef struct packed {
     arch_reg_id addr_rs1;

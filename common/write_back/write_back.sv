@@ -1,6 +1,6 @@
 import instructions_pkg::arch_reg;
 
-package write_back_pkg
+package write_back_pkg;
 
 typedef enum logic[1:0] {
     WRITE_BACK_SEL_MEM  = 2'b00,

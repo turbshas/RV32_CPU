@@ -1,6 +1,6 @@
 import instructions_pkg::arch_reg;
 
-package exec_unit_pkg
+package exec_unit_pkg;
 
 typedef enum logic {
     OP1_SEL_REG = 1'b0,
