@@ -5,8 +5,6 @@ import csr_pkg::csr_funct3_t;
 import csr_pkg::csr_write_func;
 import csr_pkg::csr_input_sel;
 
-package decode_csr_pkg;
-
 // This is expected to be placed somewhere in writeback,
 // so should have a register value already.
 module decode_csr
@@ -51,5 +49,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

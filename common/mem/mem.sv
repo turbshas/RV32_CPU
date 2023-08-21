@@ -24,6 +24,8 @@ typedef struct packed {
     mem_op_t op;
 } mem_params_t;
 
+endpackage
+
 module mem
 (
     input logic clock,
@@ -85,5 +87,3 @@ always @(*) begin
 end
 
 endmodule
-
-endpackage

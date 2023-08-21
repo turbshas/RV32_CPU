@@ -20,6 +20,7 @@ typedef enum logic[2:0] {
     IMM_NONE = 3'b111
 } imm_type_t;
 
+endpackage
 
 module imm_gen
 (
@@ -71,5 +72,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

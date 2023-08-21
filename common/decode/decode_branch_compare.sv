@@ -1,8 +1,6 @@
 import instructions_pkg::funct3_t;
 import branch_compare_pkg::branch_compare_params_t;
 
-package decode_branch_compare_pkg;
-
 module decode_branch_compare
 (
     input funct3_t funct3,
@@ -15,5 +13,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

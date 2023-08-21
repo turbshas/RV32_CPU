@@ -2,8 +2,6 @@ import instructions_pkg::instr_packet;
 import csr_pkg::csr_funct3_t;
 import reg_file_pkg::reg_file_read_params_t;
 
-package decode_reg_file_pkg;
-
 module decode_reg_file
 (
     input instr_packet instr,
@@ -42,5 +40,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

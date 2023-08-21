@@ -1,6 +1,5 @@
 import instructions_pkg::arch_reg;
 import instructions_pkg::instr_packet;
-import decode_pkg::decode;
 
 import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
@@ -10,17 +9,6 @@ import mem_pkg::mem_params_t;
 import reg_file_pkg::reg_file_read_params_t;
 import reg_file_pkg::reg_file_write_params_t;
 import write_back_pkg::write_back_select_t;
-
-import branch_compare_pkg::branch_compare;
-import csr_pkg::csr;
-import exec_unit_pkg::exec_unit;
-import fetch_pkg::fetch;
-import imm_gen_pkg::imm_gen;
-import mem_pkg::mem;
-import reg_file_pkg::reg_file;
-import write_back_pkg::write_back;
-
-package core_pkg;
 
 module core
 (
@@ -195,5 +183,3 @@ assign pc_out = PC_out;
 assign instr_out = instr;
 
 endmodule
-
-endpackage

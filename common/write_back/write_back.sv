@@ -9,6 +9,7 @@ typedef enum logic[1:0] {
     WRITE_BACK_SEL_RSVD = 2'b11
 } write_back_select_t;
 
+endpackage
 
 module write_back 
 (
@@ -30,5 +31,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

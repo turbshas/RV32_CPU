@@ -11,17 +11,6 @@ import reg_file_pkg::reg_file_read_params_t;
 import reg_file_pkg::reg_file_write_params_t;
 import write_back_pkg::write_back_select_t;
 
-import decode_branch_compare_pkg::decode_branch_compare;
-import decode_csr_pkg::decode_csr;
-import decode_exec_unit_pkg::decode_exec_unit;
-import decode_imm_gen_pkg::decode_imm_gen;
-import decode_mem_pkg::decode_mem;
-import decode_pc_input_select_pkg::decode_pc_input_select;
-import decode_reg_file_pkg::decode_reg_file;
-import decode_write_back_pkg::decode_write_back;
-
-package decode_pkg;
-
 module decode
 (
     input logic clock,
@@ -121,5 +110,3 @@ decode_mem decode_mem(
 );
 
 endmodule
-
-endpackage

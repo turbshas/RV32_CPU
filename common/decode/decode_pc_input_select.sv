@@ -1,8 +1,6 @@
 import instructions_pkg::opcode_t;
 import instructions_pkg::pc_input_sel_t;
 
-package decode_pc_input_select_pkg;
-
 module decode_pc_input_select
 (
     input logic reset,
@@ -34,5 +32,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

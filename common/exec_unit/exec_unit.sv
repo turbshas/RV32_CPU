@@ -47,6 +47,7 @@ typedef struct packed {
     exec_op_t exec_op;
 } exec_unit_params;
 
+endpackage
 
 // here is the higher level module for instancing the alu and branch compare
 // modules and fascilitating their connections
@@ -106,5 +107,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

@@ -14,7 +14,6 @@ typedef struct packed {
     branch_cond_t branch_cond;
 } branch_compare_params_t;
 
-
 typedef enum logic[1:0] {
     BRANCH_COND_EQ = 2'b00,
     BRANCH_COND_NE = 2'b01,
@@ -26,6 +25,8 @@ typedef struct packed {
     logic unsigned_cmp;
     branch_cond_t branch_cond;
 } branch_compare_params_t;
+
+endpackage
 
 module branch_compare
 (
@@ -63,5 +64,3 @@ always_comb begin
 end
 
 endmodule
-
-endpackage

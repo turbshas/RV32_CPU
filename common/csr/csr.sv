@@ -259,6 +259,7 @@ typedef struct packed {
     arch_reg ustatus;
 } csr_block_t;
 
+endpackage
 
 module csr (
     input logic clock,
@@ -360,5 +361,3 @@ end
 //  - (or fires exception)
 
 endmodule
-
-endpackage

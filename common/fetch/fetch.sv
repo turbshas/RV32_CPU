@@ -1,7 +1,5 @@
 import instructions_pkg::arch_reg;
 
-package fetch_pkg;
-
 module fetch
 (
     input logic clock,
@@ -40,5 +38,3 @@ always_ff @(posedge clock) begin
 end
 
 endmodule
-
-endpackage

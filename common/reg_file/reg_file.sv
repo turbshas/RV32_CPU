@@ -13,6 +13,7 @@ typedef struct packed {
     logic write_enable;
 } reg_file_write_params_t;
 
+endpackage
 
 module reg_file
 (
@@ -57,5 +58,3 @@ always_ff @(posedge clock) begin
 end
 
 endmodule
-
-endpackage
