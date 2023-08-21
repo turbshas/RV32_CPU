@@ -28,7 +28,7 @@ end
 `endif
 
 always_comb begin
-    registers[`REGISTER_X0] = `REG_ADDR_WIDTH'b0;
+    registers[`REGISTER_X0] = `REG_WIDTH'b0;
     data_rs1 = registers[read_params.addr_rs1];
     data_rs2 = registers[read_params.addr_rs2];
     dest_is_not_x0 = write_params.addr_rd != `REG_ADDR_WIDTH'b0;
