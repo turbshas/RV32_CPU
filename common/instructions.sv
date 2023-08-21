@@ -1,6 +1,7 @@
-`include "constants.sv"
-`include "fence_inc.sv"
+import fence_pkg::fence_fm_t;
+import fence_pkg::fence_access_ordering;
 
+package instructions_pkg
 /*
 Main instruction types:
         31                25 24       20 19            15 14                            12 11              7 6         0
@@ -68,6 +69,14 @@ typedef logic[`REG_ADDR_WIDTH - 1:0] arch_reg_id;
 typedef logic[2:0] funct3_t;
 typedef logic[6:0] funct7_t;
 typedef logic[(2 ** `REG_ADDR_WIDTH) - 1:0] arch_reg;
+
+// TODO: better place for this?
+typedef enum logic[1:0] {
+    PRIV_USER = 2'b00,
+    PRIV_SUPERVISOR = 2'b01,
+    PRIV_RSVD = 2'b10,
+    PRIV_MACHINE = 2'b11
+} priv_mode_t;
 
 // TODO: better place for this?
 typedef enum logic {
@@ -162,3 +171,5 @@ typedef struct packed {
     instr_params params;
     opcode_t opcode;
 } instr_packet;
+
+endpackage

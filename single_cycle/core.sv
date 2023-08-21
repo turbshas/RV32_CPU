@@ -1,11 +1,28 @@
-`include "instructions.sv"
+`include "constants.sv"
 
-`include "branch_compare_inc.sv"
-`include "csr_inc.sv"
-`include "exec_unit_inc.sv"
-`include "imm_gen_inc.sv"
-`include "mem_inc.sv"
-`include "reg_file_inc.sv"
+import instructions_pkg::arch_reg;
+import instructions_pkg::instr_packet;
+import decode_pkg::decode;
+
+import branch_compare_pkg::branch_compare_params_t;
+import csr_pkg::csr_params_t;
+import exec_unit_pkg::exec_unit_params;
+import imm_gen_pkg::imm_type_t;
+import mem_pkg::mem_params_t;
+import reg_file_pkg::reg_file_read_params_t;
+import reg_file_pkg::reg_file_write_params_t;
+import write_back_pkg::write_back_select_t;
+
+import branch_compare_pkg::branch_compare;
+import csr_pkg::csr;
+import exec_unit_pkg::exec_unit;
+import fetch_pkg::fetch;
+import imm_gen_pkg::imm_gen;
+import mem_pkg::mem;
+import reg_file_pkg::reg_file;
+import write_back_pkg::write_back;
+
+package core_pkg
 
 module core
 (
@@ -28,6 +45,7 @@ always_comb begin
     imem_params.access_size = MEM_ACCESS_WORD;
     imem_params.op = MEM_OP_READ;
 end
+
 mem imem(
     .clock(clock),
     .reset(reset),
@@ -177,5 +195,7 @@ decode decode_inst(
 
 assign pc_out = PC_out;
 assign instr_out = instr;
+
 endmodule
 
+endpackage

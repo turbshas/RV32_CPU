@@ -1,6 +1,8 @@
-`include "instructions.sv"
+import instructions_pkg::funct3_t;
+import instructions_pkg::funct7_t;
+import exec_unit_pkg::exec_unit_params;
 
-`include "exec_unit_inc.sv"
+package decode_exec_unit_pkg
 
 module decode_exec_unit
 (
@@ -57,3 +59,5 @@ always_comb begin
 end
 
 endmodule
+
+endpackage

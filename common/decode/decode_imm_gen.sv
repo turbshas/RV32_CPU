@@ -1,7 +1,9 @@
-`include "instructions.sv"
+import instructions_pkg::opcode_t;
+import instructions_pkg::funct3_t;
+import csr_pkg::csr_funct3_t;
+import imm_gen_pkg::imm_type_t;
 
-`include "csr_inc.sv"
-`include "imm_gen_inc.sv"
+package decode_imm_gen_pkg
 
 module decode_imm_gen
 (
@@ -37,3 +39,5 @@ always_comb begin
 end
 
 endmodule
+
+endpackage

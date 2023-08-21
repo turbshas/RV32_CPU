@@ -1,3 +1,5 @@
+package fence_pkg
+
 // Values for FENCE fm field - all other values reserved.
 typedef enum logic[3:0] {
     FENCE_FM_NONE = 4'b0000,
@@ -10,3 +12,5 @@ typedef struct packed {
     logic reads;
     logic writes;
 } fence_access_ordering;
+
+endpackage

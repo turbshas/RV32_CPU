@@ -1,6 +1,8 @@
-`include "instructions.sv"
+import instructions_pkg::opcode_t;
+import instructions_pkg::funct3_t;
+import mem_pkg::mem_params_t;
 
-`include "mem_inc.sv"
+package decode_mem_pkg
 
 module decode_mem
 (
@@ -26,3 +28,5 @@ always_comb begin
 end
 
 endmodule
+
+endpackage

@@ -20,16 +20,7 @@ FILE_LIST:=\
 
 INCLUDE_DIRS:=\
 	-I. \
-	-I../common \
-	-I../common/branch_compare \
-	-I../common/csr \
-	-I../common/exec_unit \
-	-I../common/fence \
-	-I../common/fetch \
-	-I../common/imm_gen \
-	-I../common/mem \
-	-I../common/reg_file \
-	-I../common/write_back
+	-I../common
 
 OUTPUT_NAME:=core
 TOPMODULE:=core

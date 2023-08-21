@@ -1,4 +1,6 @@
-`include "instructions.sv"
+import instructions_pkg::arch_reg
+
+package fetch_pkg
 
 module fetch
 (
@@ -38,3 +40,5 @@ always_ff @(posedge clock) begin
 end
 
 endmodule
+
+endpackage

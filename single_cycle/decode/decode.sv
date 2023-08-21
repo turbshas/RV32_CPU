@@ -1,11 +1,26 @@
-`include "instructions.sv"
+import instructions_pkg::instr_packet;
+import instructions_pkg::opcode_t;
+import instructions_pkg::funct3_t;
+import instructions_pkg::funct7_t;
+import branch_compare_pkg::branch_compare_params_t;
+import csr_pkg::csr_params_t;
+import exec_unit_pkg::exec_unit_params;
+import imm_gen_pkg::imm_type_t;
+import mem_pkg::mem_params_t;
+import reg_file_pkg::reg_file_read_params_t;
+import reg_file_pkg::reg_file_write_params_t;
+import write_back_pkg::write_back_select_t;
 
-`include "branch_compare_inc.sv"
-`include "csr_inc.sv"
-`include "exec_unit_inc.sv"
-`include "imm_gen_inc.sv"
-`include "mem_inc.sv"
-`include "reg_file_inc.sv"
+import decode_branch_compare_pkg::decode_branch_compare;
+import decode_csr_pkg::decode_csr;
+import decode_exec_unit_pkg::decode_exec_unit;
+import decode_imm_gen_pkg::decode_imm_gen;
+import decode_mem_pkg::decode_mem;
+import decode_pc_input_select_pkg::decode_pc_input_select;
+import decode_reg_file_pkg::decode_reg_file;
+import decode_write_back_pkg::decode_write_back;
+
+package decode_pkg
 
 module decode
 (
@@ -106,3 +121,5 @@ decode_mem decode_mem(
 );
 
 endmodule
+
+endpackage

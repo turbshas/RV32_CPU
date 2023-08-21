@@ -1,6 +1,18 @@
-`include "instructions.sv"
+import instructions_pkg::arch_reg_id;
+import instructions_pkg::arch_reg;
 
-`include "reg_file_inc.sv"
+package reg_file_pkg
+
+typedef struct packed {
+    arch_reg_id addr_rs1;
+    arch_reg_id addr_rs2;
+} reg_file_read_params_t;
+
+typedef struct packed {
+    arch_reg_id addr_rd;
+    logic write_enable;
+} reg_file_write_params_t;
+
 
 module reg_file
 (
@@ -28,6 +40,7 @@ end
 `endif
 
 always_comb begin
+    registers[`REGISTER_X0] = `REG_ADDR_WIDTH'b0;
     data_rs1 = registers[read_params.addr_rs1];
     data_rs2 = registers[read_params.addr_rs2];
     dest_is_not_x0 = write_params.addr_rd != `REG_ADDR_WIDTH'b0;
@@ -45,3 +58,4 @@ end
 
 endmodule
 
+endpackage

@@ -1,6 +1,7 @@
-`include "instructions.sv"
+import instructions_pkg::funct3_t;
+import branch_compare_pkg::branch_compare_params_t;
 
-`include "branch_compare_inc.sv"
+package decode_branch_compare_pkg
 
 module decode_branch_compare
 (
@@ -14,3 +15,5 @@ always_comb begin
 end
 
 endmodule
+
+endpackage

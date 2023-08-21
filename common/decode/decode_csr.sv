@@ -1,6 +1,11 @@
-`include "instructions.sv"
+import instructions_pkg::instr_packet;
+import instructions_pkg::system_instr_params;
+import csr_pkg::csr_params_t;
+import csr_pkg::csr_funct3_t;
+import csr_pkg::csr_write_func;
+import csr_pkg::csr_input_sel;
 
-`include "csr_inc.sv"
+package decode_csr_pkg
 
 // This is expected to be placed somewhere in writeback,
 // so should have a register value already.
@@ -46,3 +51,5 @@ always_comb begin
 end
 
 endmodule
+
+endpackage
