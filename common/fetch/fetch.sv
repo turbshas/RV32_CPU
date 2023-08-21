@@ -1,4 +1,4 @@
-import instructions_pkg::arch_reg
+import instructions_pkg::arch_reg;
 
 package fetch_pkg
 

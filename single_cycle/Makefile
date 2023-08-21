@@ -1,7 +1,14 @@
 FILE_LIST:=\
-	decode/decode.sv \
+	../common/fence/fence.sv \
+	../common/instructions.sv \
 	../common/branch_compare/branch_compare.sv \
 	../common/csr/csr.sv \
+	../common/exec_unit/exec_unit.sv \
+	../common/fetch/fetch.sv \
+	../common/imm_gen/imm_gen.sv \
+	../common/mem/mem.sv \
+	../common/reg_file/reg_file.sv \
+	../common/write_back/write_back.sv \
 	../common/decode/decode_branch_compare.sv \
 	../common/decode/decode_csr.sv \
 	../common/decode/decode_exec_unit.sv \
@@ -10,12 +17,7 @@ FILE_LIST:=\
 	../common/decode/decode_pc_input_select.sv \
 	../common/decode/decode_reg_file.sv \
 	../common/decode/decode_write_back.sv \
-	../common/exec_unit/exec_unit.sv \
-	../common/fetch/fetch.sv \
-	../common/imm_gen/imm_gen.sv \
-	../common/mem/mem.sv \
-	../common/reg_file/reg_file.sv \
-	../common/write_back/write_back.sv \
+	decode/decode.sv \
 	core.sv
 
 INCLUDE_DIRS:=\

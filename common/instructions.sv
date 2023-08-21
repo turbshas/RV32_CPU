@@ -1,3 +1,5 @@
+`include "constants.sv"
+
 import fence_pkg::fence_fm_t;
 import fence_pkg::fence_access_ordering;
 

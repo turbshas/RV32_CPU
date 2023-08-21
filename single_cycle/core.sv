@@ -1,5 +1,3 @@
-`include "constants.sv"
-
 import instructions_pkg::arch_reg;
 import instructions_pkg::instr_packet;
 import decode_pkg::decode;
