@@ -75,6 +75,7 @@ always_comb begin
             `CSR_RDINSTRETH: read_value = retired_instr_counter[63:32];
             `default: illegal_instr_exception = 1;
             */
+            default: ;
         endcase
     end else begin
         read_value = 32'h0;

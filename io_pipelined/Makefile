@@ -3,13 +3,13 @@ FILE_LIST:=\
 	decode/decode_X.v \
 	decode/decode_M.v \
 	decode/decode_W.v \
-	../common/mem/mem.v \
-	../common/fetch/fetch.v \
-	../common/imm_gen/imm_gen.v \
-	../common/reg_file/reg_file.v \
-	../common/branch_compare/branch_compare.v \
-	../common/exec_unit/exec_unit.v \
-	../common/write_back/write_back.v \
+	../common/mem/mem.sv \
+	../common/fetch/fetch.sv \
+	../common/imm_gen/imm_gen.sv \
+	../common/reg_file/reg_file.sv \
+	../common/branch_compare/branch_compare.sv \
+	../common/exec_unit/exec_unit.sv \
+	../common/write_back/write_back.sv \
 	core.v
 
 INCLUDE_DIRS:=\

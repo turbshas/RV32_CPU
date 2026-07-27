@@ -7,6 +7,7 @@ import instructions_pkg::OPCODE_AUIPC;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
 import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::exec_op_t;
 import exec_unit_pkg::OP1_SEL_REG;
 import exec_unit_pkg::OP1_SEL_PC;
 import exec_unit_pkg::OP2_SEL_REG;
@@ -32,9 +33,9 @@ always_comb begin
     // changes based on r type or not used
     case (opcode)
         // R-Type
-        OPCODE_OP: params.exec_op = {funct7[5], funct3};
+        OPCODE_OP: params.exec_op = exec_op_t'({funct7[5], funct3});
         // I-Type
-        OPCODE_OP_IMM: params.exec_op = {I_type_funct7, funct3};
+        OPCODE_OP_IMM: params.exec_op = exec_op_t'({I_type_funct7, funct3});
         // All others, use add
         default: params.exec_op = EXEC_OP_ADD;
     endcase

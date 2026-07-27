@@ -10,7 +10,7 @@ module decode_pc_input_select
 (
     input logic reset,
     input opcode_t opcode,
-    input logic branch_result,
+    input pc_input_sel_t branch_result,
     output pc_input_sel_t pc_input_sel
 );
 
@@ -20,12 +20,12 @@ always_comb begin
     // a B instruction
     // always take jump on a jump instruction
     if (reset)
-        pc_input_sel = 0;
+        pc_input_sel = PC_INPUT_PC_PLUS_4;
     else begin
         case (opcode)
             // B-Type
             OPCODE_BRANCH: pc_input_sel = branch_result;
-            
+
             // Jump is unconditional
             OPCODE_JAL, OPCODE_JALR: pc_input_sel = PC_INPUT_ALU;
 
