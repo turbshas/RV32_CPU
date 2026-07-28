@@ -7,9 +7,5 @@ typedef enum logic[1:0] {
     BRANCH_COND_GE = 2'b11
 } branch_cond_t;
 
-typedef struct packed {
-    logic unsigned_cmp;
-    branch_cond_t branch_cond;
-} branch_compare_params_t;
-
 endpackage
+

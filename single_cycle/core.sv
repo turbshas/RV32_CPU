@@ -1,7 +1,6 @@
 import instructions_pkg::arch_reg;
 import instructions_pkg::instr_packet;
 
-import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
 import exec_unit_pkg::exec_unit_params;
 import imm_gen_pkg::imm_type_t;
@@ -77,14 +76,8 @@ reg_file reg_file_inst(
     .registers_out(registers)
 );
 
-logic branch_result;
-branch_compare_params_t branch_compare_params;
-branch_compare branch_compare_inst(
-    .rs1(rs1_out),
-    .rs2(rs2_out),
-    .params(branch_compare_params),
-    .branch_result(branch_result)
-);
+branch_compare_io branch_compare_if( .rs1(rs1_out), .rs2(rs2_out) );
+branch_compare branch_compare_inst(branch_compare_if.BRANCH_CMP);
 
 imm_type_t imm_type;
 arch_reg imm_out;
@@ -173,8 +166,7 @@ decode decode_inst(
     .imm_type(imm_type),
     .exec_params(exec_params),
 
-    .branch_result(branch_result),
-    .branch_compare_params(branch_compare_params),
+    .bc_if(branch_compare_if.DECODE),
 
     .reg_store_sel(write_back_sel),
     .pc_input_sel(pc_input_sel),

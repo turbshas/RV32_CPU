@@ -2,7 +2,6 @@ import instructions_pkg::instr_packet;
 import instructions_pkg::opcode_t;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
-import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
 import exec_unit_pkg::exec_unit_params;
 import fence_pkg::fence_access_ordering;
@@ -25,8 +24,7 @@ module decode
     output imm_type_t imm_type,
     output exec_unit_params exec_params,
 
-    input logic branch_result,
-    output branch_compare_params_t branch_compare_params,
+    branch_compare_io bc_if,
 
     output write_back_select_t reg_store_sel,
     output logic pc_input_sel,
@@ -87,13 +85,13 @@ decode_write_back decode_write_back(
 
 decode_branch_compare decode_branch_compare(
     .funct3(funct3),
-    .params(branch_compare_params)
+    .bc_if(bc_if.DECODE_BR_CMP)
 );
 
 decode_pc_input_select decode_pc_input_select(
     .reset(reset),
     .opcode(opcode),
-    .branch_result(branch_result),
+    .branch_result(bc_if.branch_result),
     .pc_input_sel(pc_input_sel)
 );
 
