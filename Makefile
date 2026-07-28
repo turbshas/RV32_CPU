@@ -48,9 +48,9 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
 # Directories where tests are contained
-TEST_DIR := $(MKFILE_DIR)/benchmarks
+TEST_DIR := $(MKFILE_DIR)benchmarks
 INSTR_TEST_DIR := $(TEST_DIR)/individual_instructions
-INSTR_TEST_DIRS := $(wildcard $(INSTR_TEST_DIR)/*/.)
+INSTR_TEST_DIRS := $(wildcard $(INSTR_TEST_DIR)/*)
 SIMPLE_PROGRAM_DIR := $(TEST_DIR)/simple_programs
 
 # Test files in those directories
@@ -64,11 +64,11 @@ INSTR_TESTS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(INSTR_TEST_FI
 SIMPLE_PROGRAMS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(SIMPLE_PROGRAM_FILES))
 
 test_output/%.out: $(TEST_DIR)/%.x obj_dir/$(VERILATOR_NAME)
-	@mkdir $(notdir $@)
-	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
+	@mkdir -p $(dir $@)
+	obj_dir/$(VERILATOR_NAME) "$<" "vcd_output/$*.vcd" > "test_output/$*.out"
 
 vcd_output/%.vcd: $(TEST_DIR)/%.x
-	@mkdir $(notdir $@)
+	@mkdir -p $(dir $@)
 	obj_dir/$(VERILATOR_NAME) $< vcd_output/$*.vcd > test_output/$*.out
 
 test: $(INSTR_TESTS_OUT) $(SIMPLE_PROGRAMS_OUT)

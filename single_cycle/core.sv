@@ -2,7 +2,6 @@ import instructions_pkg::arch_reg;
 import instructions_pkg::instr_packet;
 
 import csr_pkg::csr_params_t;
-import exec_unit_pkg::exec_unit_params;
 import imm_gen_pkg::imm_type_t;
 import mem_pkg::mem_params_t;
 import reg_file_pkg::reg_file_read_params_t;
@@ -87,21 +86,20 @@ imm_gen imm_gen_inst(
     .immediate_out(imm_out)
 );
 
-exec_unit_params exec_params;
 arch_reg exec_unit_out;
-assign new_PC_in = exec_unit_out;
-// TODO in PD5: chnage to support bypassing
-exec_unit exec_unit_inst(
+exec_unit_io eu_if(
     // inputs
     .pc(PC_out),
     .rs1(rs1_out),
     .rs2(rs2_out),
     .imm_val(imm_out),
-    .params(exec_params),
 
     // outputs
     .exec_out(exec_unit_out)
 );
+assign new_PC_in = exec_unit_out;
+// TODO in PD5: chnage to support bypassing
+exec_unit exec_unit_inst(eu_if.EXEC_UNIT);
 
 arch_reg dmem_in;
 assign dmem_in = rs2_out;
@@ -164,7 +162,7 @@ decode decode_inst(
     .reg_file_write_params(reg_file_write_params),
 
     .imm_type(imm_type),
-    .exec_params(exec_params),
+    .eu_if(eu_if.DECODE),
 
     .bc_if(branch_compare_if.DECODE),
 

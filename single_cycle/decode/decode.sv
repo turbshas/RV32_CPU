@@ -3,7 +3,6 @@ import instructions_pkg::opcode_t;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
 import csr_pkg::csr_params_t;
-import exec_unit_pkg::exec_unit_params;
 import fence_pkg::fence_access_ordering;
 import fence_pkg::fence_fm_t;
 import imm_gen_pkg::imm_type_t;
@@ -22,7 +21,7 @@ module decode
     output reg_file_write_params_t reg_file_write_params,
 
     output imm_type_t imm_type,
-    output exec_unit_params exec_params,
+    exec_unit_io eu_if,
 
     branch_compare_io bc_if,
 
@@ -72,7 +71,7 @@ decode_exec_unit decode_exec_unit(
     .opcode(opcode),
     .funct3(funct3),
     .funct7(funct7),
-    .params(exec_params)
+    .eu_if(eu_if.DECODE)
 );
 
 /* Write-Back Stage  */

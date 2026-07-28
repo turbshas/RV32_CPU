@@ -39,10 +39,4 @@ typedef enum logic[3:0] {
     EXEC_OP_AND2        = 4'b1111
 } exec_op_t;
 
-typedef struct packed {
-    op1_select_t operand1_sel;
-    op2_select_t operand2_sel;
-    exec_op_t exec_op;
-} exec_unit_params;
-
 endpackage
