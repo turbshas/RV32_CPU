@@ -50,7 +50,7 @@ always @(posedge clock) begin
     end
 end
 
-wire byte_sign, half_word_sign;
+logic byte_sign, half_word_sign;
 logic[7:0] byte0, byte1, byte2, byte3;
 
 always_comb begin
