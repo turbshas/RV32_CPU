@@ -2,4 +2,5 @@
 *.vcd
 **/obj_dir/**
 **/test_output/**
+Session.vim
 

@@ -23,7 +23,7 @@ module mem
     input logic setup_write
 );
 
-reg[7:0] data[0:`MEM_SIZE - 1];
+reg[7:0] data[`MEM_SIZE];
 
 /* Preparing data at runtime */
 always @(posedge clock) begin
@@ -51,21 +51,30 @@ always @(posedge clock) begin
 end
 
 wire byte_sign, half_word_sign;
-assign byte_sign = data[address][7] & ~params.read_unsigned;
-assign half_word_sign = data[address + 1][7] & ~params.read_unsigned;
+logic[7:0] byte0, byte1, byte2, byte3;
 
-always @(*) begin
-    data_out[7:0] = data[address];
+always_comb begin
+    byte0 = data[address];
+    byte1 = data[address + 1];
+    byte2 = data[address + 2];
+    byte3 = data[address + 3];
+
+    byte_sign = byte0[7] & ~params.read_unsigned;
+    half_word_sign = byte1[7] & ~params.read_unsigned;
+end
+
+always_comb begin
+    data_out[7:0] = byte0;
 
     if (params.access_size == MEM_ACCESS_BYTE) begin
         data_out[31:8] = {24{byte_sign}};
     end else if (params.access_size == MEM_ACCESS_HALF) begin
-        data_out[15:8] = data[address + 1];
+        data_out[15:8] = byte1;
         data_out[31:16] = {16{half_word_sign}};
     end else begin /* MEM_ACCESS_WORD */
-        data_out[15:8] = data[address + 1];
-        data_out[23:16] = data[address + 2];
-        data_out[31:24] = data[address + 3];
+        data_out[15:8] = byte1;
+        data_out[23:16] = byte2;
+        data_out[31:24] = byte3;
     end
 end
 
