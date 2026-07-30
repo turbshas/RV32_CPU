@@ -3,34 +3,35 @@ module core
 (
     input wire clock,
     input wire reset,
-    output wire[31:0] instr_out,
-    output reg[31:0] registers[32],
+    output arch_reg instr_out,
+    output arch_reg registers[32],
 
     input wire setup_write,
-    input wire[31:0] setup_address,
-    input wire[31:0] setup_data_in
+    input arch_reg setup_address,
+    input arch_reg setup_data_in
 );
 /* Pipeline registers */
-reg[31:0] F_D_PC_out;
-reg[31:0] F_D_instr;
+arch_reg F_D_PC_out;
+arch_reg F_D_instr;
 
-reg[31:0] D_X_PC_out;
-reg[31:0] D_X_instr;
-reg[31:0] D_X_rs1;
-reg[31:0] D_X_rs2;
-reg[31:0] D_X_imm;
+arch_reg D_X_PC_out;
+arch_reg D_X_instr;
+arch_reg D_X_rs1;
+arch_reg D_X_rs2;
+arch_reg D_X_imm;
 
-reg[31:0] X_M_PC_out;
-reg[31:0] X_M_instr;
-reg[31:0] X_M_exec_unit_out;
-reg[31:0] X_M_dmem_in;
+arch_reg X_M_PC_out;
+arch_reg X_M_instr;
+arch_reg X_M_exec_unit_out;
+arch_reg X_M_dmem_in;
 
-reg[31:0] M_W_instr;
-reg[31:0] M_W_writeback_out;
+arch_reg M_W_instr;
+arch_reg M_W_writeback_out;
 
 /* Fetch stage */
-reg[31:0] PC_out;
-reg[31:0] imem_out;
+arch_reg PC_out;
+arch_reg imem_out;
+
 mem imem(
     /* Inputs */
     .clock(clock),

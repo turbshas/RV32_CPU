@@ -23,13 +23,49 @@ module core
     input arch_reg setup_data_in
 );
 
-arch_reg PC_out;
-arch_reg imem_out;
+arch_reg
+    PC_out,
+    imem_out,
+    new_PC_in,
+    raw_instr,
+    rd_in,
+    rs1_out,
+    rs2_out,
+    imm_out,
+    exec_unit_out,
+    dmem_in,
+    dmem_out,
+    csr_out
+    ;
+
 mem_params_t imem_params;
+reg_file_read_params_t reg_file_read_params;
+reg_file_write_params_t reg_file_write_params;
+branch_compare_params_t branch_compare_params;
+exec_unit_params exec_params;
+mem_params_t mem_params;
+csr_params_t csr_params;
+
+logic pc_input_sel;
+logic branch_result;
+logic csr_illegal_instr;
+logic[1:0] write_back_sel;
+logic[31:0] write_back_out; // could change to rd_in directly
+
+imm_type_t imm_type;
+instr_packet instr;
+
 always_comb begin
     imem_params.read_unsigned = 1;
     imem_params.access_size = MEM_ACCESS_WORD;
     imem_params.op = MEM_OP_READ;
+
+    new_PC_in = exec_unit_out;
+    dmem_in = rs2_out;
+    rd_in = write_back_out;
+    pc_out = PC_out;
+    instr = raw_instr;
+    instr_out = instr;
 end
 
 mem imem(
@@ -46,13 +82,6 @@ mem imem(
     .setup_data_in(setup_data_in)
 );
 
-logic pc_input_sel;
-arch_reg new_PC_in;
-arch_reg raw_instr;
-instr_packet instr;
-always_comb begin
-    instr = raw_instr;
-end
 fetch fetch_inst(
     .clock(clock),
     .reset(reset),
@@ -64,9 +93,6 @@ fetch fetch_inst(
     .instr(raw_instr)
 );
 
-reg_file_read_params_t reg_file_read_params;
-reg_file_write_params_t reg_file_write_params;
-arch_reg rd_in, rs1_out, rs2_out;
 reg_file reg_file_inst(
     .clock(clock),
     .read_params(reg_file_read_params),
@@ -77,8 +103,6 @@ reg_file reg_file_inst(
     .registers_out(registers)
 );
 
-logic branch_result;
-branch_compare_params_t branch_compare_params;
 branch_compare branch_compare_inst(
     .rs1(rs1_out),
     .rs2(rs2_out),
@@ -86,17 +110,12 @@ branch_compare branch_compare_inst(
     .branch_result(branch_result)
 );
 
-imm_type_t imm_type;
-arch_reg imm_out;
 imm_gen imm_gen_inst(
     .instr(instr.params),
     .imm_type(imm_type),
     .immediate_out(imm_out)
 );
 
-exec_unit_params exec_params;
-arch_reg exec_unit_out;
-assign new_PC_in = exec_unit_out;
 // TODO in PD5: chnage to support bypassing
 exec_unit exec_unit_inst(
     // inputs
@@ -110,10 +129,6 @@ exec_unit exec_unit_inst(
     .exec_out(exec_unit_out)
 );
 
-arch_reg dmem_in;
-assign dmem_in = rs2_out;
-arch_reg dmem_out;
-mem_params_t mem_params;
 mem dmem(
     .clock(clock),
     .reset(reset),
@@ -128,9 +143,6 @@ mem dmem(
     .setup_data_in(setup_data_in)
 );
 
-csr_params_t csr_params;
-arch_reg csr_out;
-logic csr_illegal_instr;
 csr csr(
     .clock(clock),
     .reset(reset),
@@ -144,22 +156,19 @@ csr csr(
     .illegal_instr_exception(csr_illegal_instr)
 );
 
-reg[1:0] write_back_sel;
-reg[31:0] write_back_out; // could change to rd_in directly
-assign rd_in = write_back_out;
 write_back write_back_inst(
     //inputs
     .mem_in(dmem_out),
     .alu_in(exec_unit_out),
     .pc_in(PC_out),
     .write_back_sel(write_back_sel),
-    
+
     // outputs
     .write_back_out(write_back_out)
 );
 
 // The WB stage consists more of just connecting to reg file, so most
-// of it can be done from this higher level, and the module exsits to 
+// of it can be done from this higher level, and the module exsits to
 // implement a mux to determine which value to write back
 
 decode decode_inst(
@@ -182,8 +191,5 @@ decode decode_inst(
     .mem_params(mem_params),
     .csr_params(csr_params)
 );
-
-assign pc_out = PC_out;
-assign instr_out = instr;
 
 endmodule

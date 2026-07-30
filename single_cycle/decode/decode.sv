@@ -36,7 +36,7 @@ module decode
 );
 
 // R-type values
-opcode_t opcode; 
+opcode_t opcode;
 funct3_t funct3;
 funct7_t funct7;
 
