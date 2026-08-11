@@ -1,5 +1,6 @@
+`include "constants.sv"
 import instructions_pkg::arch_reg;
-import instructions_pkg::instr_params;
+import instructions_pkg::instr_params_t;
 import imm_gen_pkg::imm_type_t;
 import imm_gen_pkg::IMM_I;
 import imm_gen_pkg::IMM_S;
@@ -10,7 +11,7 @@ import imm_gen_pkg::IMM_C;
 
 module imm_gen
 (
-    input instr_params instr,
+    input instr_params_t instr,
     input imm_type_t imm_type,
     output arch_reg immediate_out
 );
@@ -38,9 +39,21 @@ end
 always_comb begin
     I_immediate = { {20{i_sign}}, instr.i_instr.imm };
     S_immediate = { {20{s_sign}}, instr.s_instr.imm_b11to5, instr.s_instr.imm_b4to0 };
-    B_immediate = { {20{b_sign}}, instr.b_instr.imm_b11, instr.b_instr.imm_b10to5, instr.b_instr.imm_b4to1, 1'b0 };
+    B_immediate = {
+        {20{b_sign}},
+        instr.b_instr.imm_b11,
+        instr.b_instr.imm_b10to5,
+        instr.b_instr.imm_b4to1,
+        1'b0
+    };
     U_immediate = { instr.u_instr.imm, 12'b0 };
-    J_immediate = { {12{j_sign}}, instr.j_instr.imm_b19to12, instr.j_instr.imm_b11, instr.j_instr.imm_b10to1, 1'b0 };
+    J_immediate = {
+        {12{j_sign}},
+        instr.j_instr.imm_b19to12,
+        instr.j_instr.imm_b11,
+        instr.j_instr.imm_b10to1,
+        1'b0
+    };
     CSR_immediate = { 27'b0, instr.system.rs1_or_uimm };
 end
 

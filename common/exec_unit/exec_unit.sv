@@ -1,5 +1,5 @@
 import instructions_pkg::arch_reg;
-import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::exec_unit_params_t;
 import exec_unit_pkg::OP1_SEL_REG;
 import exec_unit_pkg::OP1_SEL_PC;
 import exec_unit_pkg::OP2_SEL_REG;
@@ -29,7 +29,7 @@ module exec_unit
     input arch_reg rs1,
     input arch_reg rs2,
     input arch_reg imm_val,
-    input exec_unit_params params,
+    input exec_unit_params_t params,
     output arch_reg exec_out
 );
 
@@ -41,7 +41,7 @@ logic unsigned_1_less_than_2;
 
 // Assign operand 1
 always_comb begin
-    case (params.operand1_sel)
+    unique case (params.operand1_sel)
         OP1_SEL_REG: operand1 = rs1;
         OP1_SEL_PC:  operand1 = pc;
     endcase
@@ -49,7 +49,7 @@ end
 
 // assign operand 2
 always_comb begin
-    case(params.operand2_sel)
+    unique case (params.operand2_sel)
         OP2_SEL_REG: operand2 = rs2;
         OP2_SEL_IMM: operand2 = imm_val;
     endcase

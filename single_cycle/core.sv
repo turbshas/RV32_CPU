@@ -1,9 +1,9 @@
 import instructions_pkg::arch_reg;
-import instructions_pkg::instr_packet;
+import instructions_pkg::instr_packet_t;
 
 import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
-import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::exec_unit_params_t;
 import imm_gen_pkg::imm_type_t;
 import mem_pkg::mem_params_t;
 import reg_file_pkg::reg_file_read_params_t;
@@ -15,7 +15,7 @@ module core
     input logic clock,
     input logic reset,
     output arch_reg pc_out,
-    output instr_packet instr_out,
+    output instr_packet_t instr_out,
     output arch_reg registers[32],
 
     input logic setup_write,
@@ -42,7 +42,7 @@ mem_params_t imem_params;
 reg_file_read_params_t reg_file_read_params;
 reg_file_write_params_t reg_file_write_params;
 branch_compare_params_t branch_compare_params;
-exec_unit_params exec_params;
+exec_unit_params_t exec_params;
 mem_params_t mem_params;
 csr_params_t csr_params;
 
@@ -53,7 +53,7 @@ logic[1:0] write_back_sel;
 logic[31:0] write_back_out; // could change to rd_in directly
 
 imm_type_t imm_type;
-instr_packet instr;
+instr_packet_t instr;
 
 always_comb begin
     imem_params.read_unsigned = 1;

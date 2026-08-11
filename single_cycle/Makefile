@@ -1,6 +1,6 @@
 FILE_LIST:=\
 	../common/fence/fence_pkg.sv \
-	../common/instructions.sv \
+	../common/instructions_pkg.sv \
 	../common/branch_compare/branch_compare_pkg.sv \
 	../common/csr/csr_pkg.sv \
 	../common/exec_unit/exec_unit_pkg.sv \

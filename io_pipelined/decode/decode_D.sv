@@ -1,22 +1,29 @@
-`include "imm_gen_inc.v"
+import instructions_pkg::arch_reg;
+import imm_gen_pkg::imm_type_t;
+import imm_gen_pkg::IMM_I;
+import imm_gen_pkg::IMM_S;
+import imm_gen_pkg::IMM_B;
+import imm_gen_pkg::IMM_U;
+import imm_gen_pkg::IMM_J;
+import imm_gen_pkg::IMM_NONE;
 
 module decode_D
 (
-    input wire[31:0] instr,
-    input wire[31:0] X_stage_instr,
-    input wire[31:0] M_stage_instr,
-    input wire[31:0] W_stage_instr,
-    output reg[4:0] rs1,
-    output reg[4:0] rs2,
-    output reg[2:0] imm_type,
-    output reg stall_F_D
+    input arch_reg instr,
+    input arch_reg X_stage_instr,
+    input arch_reg M_stage_instr,
+    input arch_reg W_stage_instr,
+    output logic[4:0] rs1,
+    output logic[4:0] rs2,
+    output imm_type_t imm_type,
+    output logic stall_F_D
 );
 
 // R-type values
-reg[4:0] opcode; // 2 lsb are always 11 for 32-bit instructions
+logic[4:0] opcode; // 2 lsb are always 11 for 32-bit instructions
 
 // always block for picking out pieces of the instruction
-always @(*) begin
+always_comb begin
     opcode = instr[6:2];
 
     case (opcode)
@@ -31,32 +38,32 @@ end
 /* Reg/Immediate stage  */
 
 // always block for determining instruction type
-always @(*) begin
+always_comb begin
     case (opcode)
-        5'b11001: imm_type = `I_IMM_T;
-        5'b00000: imm_type = `I_IMM_T;
-        5'b00100: imm_type = `I_IMM_T;
-        5'b01000: imm_type = `S_IMM_T;
-        5'b11000: imm_type = `B_IMM_T;
-        5'b01101: imm_type = `U_IMM_T;
-        5'b00101: imm_type = `U_IMM_T;
-        5'b11011: imm_type = `J_IMM_T;
-        default: imm_type = `NONE_IMM_T;
+        5'b11001: imm_type = IMM_I;
+        5'b00000: imm_type = IMM_I;
+        5'b00100: imm_type = IMM_I;
+        5'b01000: imm_type = IMM_S;
+        5'b11000: imm_type = IMM_B;
+        5'b01101: imm_type = IMM_U;
+        5'b00101: imm_type = IMM_U;
+        5'b11011: imm_type = IMM_J;
+        default: imm_type = IMM_NONE;
     endcase
 end
 
-reg[4:0] X_opcode, X_rd;
-reg[4:0] M_opcode, M_rd;
-reg[4:0] W_opcode, W_rd;
-reg X_op_has_dest, M_op_has_dest, W_op_has_dest;
-reg has_rs2;
-reg X_dest_required_rs1, X_dest_required_rs2;
-reg W_dest_required_rs1, W_dest_required_rs2;
-reg M_bypass_available_rs1, M_bypass_available_rs2;
-reg W_bypass_available_rs1, W_bypass_available_rs2;
-reg load_use;
+logic[4:0] X_opcode, X_rd;
+logic[4:0] M_opcode, M_rd;
+logic[4:0] W_opcode, W_rd;
+logic X_op_has_dest, M_op_has_dest, W_op_has_dest;
+logic has_rs2;
+logic X_dest_required_rs1, X_dest_required_rs2;
+logic W_dest_required_rs1, W_dest_required_rs2;
+logic M_bypass_available_rs1, M_bypass_available_rs2;
+logic W_bypass_available_rs1, W_bypass_available_rs2;
+logic load_use;
 // always block for determining whether to stall or not
-always @(*) begin
+always_comb begin
     X_opcode = X_stage_instr[6:2];
     M_opcode = M_stage_instr[6:2];
     W_opcode = W_stage_instr[6:2];

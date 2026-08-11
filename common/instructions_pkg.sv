@@ -94,7 +94,7 @@ typedef struct packed {
     arch_reg_id rs1;
     funct3_t funct3;
     arch_reg_id rd;
-} fence_instr_params;
+} fence_instr_params_t;
 
 typedef struct packed {
     funct7_t funct7;
@@ -102,14 +102,14 @@ typedef struct packed {
     arch_reg_id rs1;
     funct3_t funct3;
     arch_reg_id rd;
-} r_instr_params;
+} r_instr_params_t;
 
 typedef struct packed {
     logic[11:0] imm;
     arch_reg_id rs1;
     funct3_t funct3;
     arch_reg_id rd;
-} i_instr_params;
+} i_instr_params_t;
 
 typedef struct packed {
     logic[11:5] imm_b11to5;
@@ -118,7 +118,7 @@ typedef struct packed {
     funct3_t funct3;
     // Concatenated onto imm_11to5 -> imm[11:0]
     logic[4:0] imm_b4to0;
-} s_instr_params;
+} s_instr_params_t;
 
 typedef struct packed {
     logic imm_b12;
@@ -130,14 +130,14 @@ typedef struct packed {
     // Concatenate { imm_b12, imm_b11, imm_b10to5, imm_b4to1, } to form final immediate.
     // (bit 0 must be zero as the branch must be 2-aligned).
     logic imm_b11;
-} b_instr_params;
+} b_instr_params_t;
 
 typedef struct packed {
     // Comprises only the upper 20 bits of the immediate.
     // The value of PC is added to this to form the resulting address.
     logic[19:0] imm;
     arch_reg_id rd;
-} u_instr_params;
+} u_instr_params_t;
 
 typedef struct packed {
     // Rearrange { imm_b20, imm_b19to12, imm_b11, imm_b10to1, } to form final immediate.
@@ -147,7 +147,7 @@ typedef struct packed {
     logic imm_b11;
     logic[7:0] imm_b19to12;
     arch_reg_id rd;
-} j_instr_params;
+} j_instr_params_t;
 
 typedef struct packed {
     /** [11:10] = access (R/W or R/O), [9:8] = privilege (U/S/H/M). */
@@ -157,22 +157,22 @@ typedef struct packed {
     /** CSR write function - 000 for other system operations (e.g. ECALL/EBREAK). */
     funct3_t funct3;
     arch_reg_id rd;
-} system_instr_params;
+} system_instr_params_t;
 
 typedef union packed {
-    r_instr_params r_instr;
-    i_instr_params i_instr;
-    s_instr_params s_instr;
-    b_instr_params b_instr;
-    u_instr_params u_instr;
-    j_instr_params j_instr;
-    fence_instr_params fence;
-    system_instr_params system;
-} instr_params;
+    r_instr_params_t r_instr;
+    i_instr_params_t i_instr;
+    s_instr_params_t s_instr;
+    b_instr_params_t b_instr;
+    u_instr_params_t u_instr;
+    j_instr_params_t j_instr;
+    fence_instr_params_t fence;
+    system_instr_params_t system;
+} instr_params_t;
 
 typedef struct packed {
-    instr_params params;
+    instr_params_t params;
     opcode_t opcode;
-} instr_packet;
+} instr_packet_t;
 
 endpackage

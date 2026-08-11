@@ -1,5 +1,5 @@
-import instructions_pkg::instr_packet;
-import instructions_pkg::system_instr_params;
+import instructions_pkg::instr_packet_t;
+import instructions_pkg::system_instr_params_t;
 import csr_pkg::csr_params_t;
 import csr_pkg::csr_funct3_t;
 import csr_pkg::csr_write_func;
@@ -11,12 +11,12 @@ import csr_pkg::csr_input_sel;
 // so should have a register value already.
 module decode_csr
 (
-    input instr_packet instr,
+    input instr_packet_t instr,
     output csr_params_t csr_params
 );
 
 logic is_system_instr;
-system_instr_params system_params;
+system_instr_params_t system_params;
 csr_funct3_t csr_funct3;
 always_comb begin
     is_system_instr = instr.opcode == OPCODE_SYSTEM;

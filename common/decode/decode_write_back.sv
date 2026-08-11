@@ -1,4 +1,4 @@
-import instructions_pkg::instr_packet;
+import instructions_pkg::instr_packet_t;
 import instructions_pkg::OPCODE_STORE;
 import instructions_pkg::OPCODE_BRANCH;
 import instructions_pkg::OPCODE_LOAD;
@@ -12,7 +12,7 @@ import write_back_pkg::WRITE_BACK_SEL_PC;
 module decode_write_back
 (
     input logic reset,
-    input instr_packet instr,
+    input instr_packet_t instr,
     output reg_file_write_params_t reg_file_write_params,
     output write_back_select_t reg_store_sel
 );

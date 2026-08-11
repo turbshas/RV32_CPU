@@ -43,6 +43,6 @@ typedef struct packed {
     op1_select_t operand1_sel;
     op2_select_t operand2_sel;
     exec_op_t exec_op;
-} exec_unit_params;
+} exec_unit_params_t;
 
 endpackage

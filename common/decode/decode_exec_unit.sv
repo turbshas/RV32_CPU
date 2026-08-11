@@ -6,7 +6,7 @@ import instructions_pkg::OPCODE_JAL;
 import instructions_pkg::OPCODE_AUIPC;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
-import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::exec_unit_params_t;
 import exec_unit_pkg::exec_op_t;
 import exec_unit_pkg::OP1_SEL_REG;
 import exec_unit_pkg::OP1_SEL_PC;
@@ -19,7 +19,7 @@ module decode_exec_unit
     input opcode_t opcode,
     input funct3_t funct3,
     input funct7_t funct7,
-    output exec_unit_params params
+    output exec_unit_params_t params
 );
 
 // exec_op

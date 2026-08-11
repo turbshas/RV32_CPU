@@ -1,8 +1,8 @@
 FILE_LIST:=\
-	decode/decode_D.v \
-	decode/decode_X.v \
-	decode/decode_M.v \
-	decode/decode_W.v \
+	decode/decode_D.sv \
+	decode/decode_X.sv \
+	decode/decode_M.sv \
+	decode/decode_W.sv \
 	../common/mem/mem.sv \
 	../common/fetch/fetch.sv \
 	../common/imm_gen/imm_gen.sv \
@@ -10,10 +10,11 @@ FILE_LIST:=\
 	../common/branch_compare/branch_compare.sv \
 	../common/exec_unit/exec_unit.sv \
 	../common/write_back/write_back.sv \
-	core.v
+	core.sv
 
 INCLUDE_DIRS:=\
 	-I. \
+	-I../common/ \
 	-I../common/mem \
 	-I../common/fetch \
 	-I../common/decode \

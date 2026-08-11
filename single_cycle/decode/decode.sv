@@ -1,10 +1,10 @@
-import instructions_pkg::instr_packet;
+import instructions_pkg::instr_packet_t;
 import instructions_pkg::opcode_t;
 import instructions_pkg::funct3_t;
 import instructions_pkg::funct7_t;
 import branch_compare_pkg::branch_compare_params_t;
 import csr_pkg::csr_params_t;
-import exec_unit_pkg::exec_unit_params;
+import exec_unit_pkg::exec_unit_params_t;
 import fence_pkg::fence_access_ordering;
 import fence_pkg::fence_fm_t;
 import imm_gen_pkg::imm_type_t;
@@ -17,13 +17,13 @@ module decode
 (
     input logic clock,
     input logic reset,
-    input instr_packet instr,
+    input instr_packet_t instr,
 
     output reg_file_read_params_t reg_file_read_params,
     output reg_file_write_params_t reg_file_write_params,
 
     output imm_type_t imm_type,
-    output exec_unit_params exec_params,
+    output exec_unit_params_t exec_params,
 
     input logic branch_result,
     output branch_compare_params_t branch_compare_params,

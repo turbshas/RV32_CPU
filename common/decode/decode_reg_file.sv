@@ -1,4 +1,4 @@
-import instructions_pkg::instr_packet;
+import instructions_pkg::instr_packet_t;
 import instructions_pkg::OPCODE_LUI;
 import instructions_pkg::OPCODE_SYSTEM;
 import csr_pkg::csr_funct3_t;
@@ -7,7 +7,7 @@ import reg_file_pkg::reg_file_read_params_t;
 
 module decode_reg_file
 (
-    input instr_packet instr,
+    input instr_packet_t instr,
     output reg_file_read_params_t params
 );
 

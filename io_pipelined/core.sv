@@ -1,4 +1,7 @@
+import instructions_pkg::arch_reg;
+
 `define NOP_INSTR 32'h00000013
+
 module core
 (
     input wire clock,
@@ -39,7 +42,7 @@ mem imem(
     .address(PC_out),
     .data_in(),
     .read_write(1),
-    .access_size(`ACCESS_SIZE_WORD),
+    .access_size(MEM_ACCESS_WORD),
     .unsigned_access(1),
     /* Outputs */
     .data_out(imem_out),
