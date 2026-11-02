@@ -4,7 +4,7 @@ import write_back_pkg::WRITE_BACK_SEL_ALU;
 import write_back_pkg::WRITE_BACK_SEL_MEM;
 import write_back_pkg::WRITE_BACK_SEL_PC;
 
-module write_back 
+module write_back
 (
   input arch_reg mem_in,
   input arch_reg alu_in,

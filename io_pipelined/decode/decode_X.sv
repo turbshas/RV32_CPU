@@ -1,19 +1,28 @@
+import branch_compare_pkg::branch_cond_t;
+import instructions_pkg::pc_input_sel_t;
+import instructions_pkg::PC_INPUT_ALU;
+import instructions_pkg::PC_INPUT_PC_PLUS_4;
+import exec_unit_pkg::exec_unit_params_t;
+import exec_unit_pkg::exec_op_t;
+import exec_unit_pkg::EXEC_OP_ADD;
+import exec_unit_pkg::OP1_SEL_REG;
+import exec_unit_pkg::OP1_SEL_PC;
+import exec_unit_pkg::OP2_SEL_REG;
+import exec_unit_pkg::OP2_SEL_IMM;
+
 module decode_X
 (
     input wire[31:0] instr,
-    input wire branch_cmp_eq,
-    input wire branch_cmp_lt,
+    input pc_input_sel_t branch_result,
     input wire[31:0] M_stage_instr,
     input wire[31:0] W_stage_instr,
-    output reg[3:0] exec_op,
+    output exec_unit_params_t exec_unit_params,
     output reg[1:0] rs1_source,
     output reg[1:0] rs2_source,
-    output reg operand1_sel,
-    output reg operand2_sel,
     output reg dmem_in_sel,
-    output reg pc_input_sel,
+    output pc_input_sel_t pc_input_sel,
     output reg flush_F_D,
-    output reg branch_cmp_unsigned
+    output branch_compare_params_t branch_cmp_params
 );
 
 // R-type values
@@ -23,7 +32,7 @@ reg[6:0] funct7;
 reg [4:0] instr_rs1, instr_rs2;
 
 // always block for picking out pieces of the instruction
-always @(*) begin
+always_comb begin
     opcode = instr[6:2];
     funct3 = instr[14:12];
     funct7 = instr[31:25];
@@ -35,60 +44,44 @@ always @(*) begin
     instr_rs2 = instr[24:20];
 end
 
-/* Execute Stage  */
+assign branch_cmp_params.unsigned_cmp = funct3[1];
+assign branch_cmp_params.branch_cond = branch_cond_t'({funct3[2],funct3[0]});
+/* If we're setting the PC, need to flush F and D stages */
+assign flush_F_D = pc_input_sel;
+// does not have forwarding from M stage, and rs2_source[0] only changes
+// to a 1 when it detects it needs to forward from W stage
+assign dmem_in_sel = rs2_source[0];
 
-// branch_cmp_unsigned
-always @(*) begin
-    branch_cmp_unsigned = funct3[1];
-end
-
-// pc_input_sel
-always @(*) begin
+always_comb begin
     // either takes PC+4 or ALU when branch false or true respectively, on
     // a B instruction
     // always take jump on a jump instruction
     case (opcode)
         // B-Type
-        5'b11000:
-          begin
-            // Check each branch inst.
-            case ({funct3[2],funct3[0]})
-                2'b00: pc_input_sel = branch_cmp_eq; // BEQ
-                2'b01: pc_input_sel = !(branch_cmp_eq); // BNE
-                2'b11: pc_input_sel = !(branch_cmp_lt); // BGE
-                2'b10: pc_input_sel = branch_cmp_lt; // BLT
-            endcase // funct3
-          end
-        
+        5'b11000: pc_input_sel = branch_result;
         // Jump is unconditional
-        5'b11001, 5'b11011: pc_input_sel = 1; // ALU
-
+        5'b11001, 5'b11011: pc_input_sel = PC_INPUT_ALU;
         // rest take PC+4 every time
-        default: pc_input_sel = 0; // PC + 4
+        default: pc_input_sel = PC_INPUT_PC_PLUS_4;
     endcase // opcode
 end
 
-always @(*) begin
-    /* If we're setting the PC, need to flush F and D stages */
-    flush_F_D = pc_input_sel;
-end
-
-// exec_op
 reg I_type_funct7;
-always @(*) begin
+always_comb begin
     // SRAI/SRLI are the only I-type that uses funct7
     I_type_funct7 = (funct3 == 3'b101) & funct7[5];
     // changes based on r type or not used
     case (opcode)
         // R-Type
-        5'b01100: exec_op = {funct7[5], funct3};
+        5'b01100: exec_unit_params.exec_op = exec_op_t'({funct7[5], funct3});
         // I-Type
-        5'b00100: exec_op = {I_type_funct7, funct3};
+        5'b00100: exec_unit_params.exec_op = exec_op_t'({I_type_funct7, funct3});
         // All others, use add
-        default: exec_op = 4'b0000;
+        default: exec_unit_params.exec_op = EXEC_OP_ADD;
     endcase
 end
 
+// TODO: see if I can clean this block up as well
 // logic for determining where rs1 or rs2 come from,
 // bypass or reg file
 // if rs1 or rs2 is not used, that is handled by other parts
@@ -97,12 +90,12 @@ end
 reg [4:0] M_opcode, M_rd;
 reg [4:0] W_opcode, W_rd;
 reg M_no_rd, W_no_rd;
-always @(*) begin
+always_comb begin
     // have to look at instructions from X,M,W stages,
     // source priority: M then W then regfile
     // signals to set:
     //   2'b00 : reg file, 2'b10 : M, 2'b11 : W
-    
+
     // pick off useful parts for figuring out Instr is
     // in each stage
     M_opcode = M_stage_instr[6:2];
@@ -139,38 +132,30 @@ always @(*) begin
     end
 end
 
-// ALU operand1_sel / operand2_sel
-always @(*) begin
+always_comb begin
     case (opcode)
         // R-Type
         5'b01100:
         begin
-            operand1_sel = 0; // reg
-            operand2_sel = 0; // reg
+            exec_unit_params.operand1_sel = OP1_SEL_REG;
+            exec_unit_params.operand2_sel = OP2_SEL_REG;
         end
 
         // B-Type, J-Type, AUIPC
         5'b11000, 5'b11011 , 5'b00101 :
         begin
-            operand1_sel = 1; // PC
-            operand2_sel = 1; // imm
+            exec_unit_params.operand1_sel = OP1_SEL_PC;
+            exec_unit_params.operand2_sel = OP2_SEL_IMM;
         end
 
         // I-Type, S-Type, JALR, LUI (make sure rs1 is set to x0)
         //5'b00100, 5'b01000, 5'11001, 5'b01101:
         default:
         begin
-            operand1_sel = 0; // reg
-            operand2_sel = 1; // imm
+            exec_unit_params.operand1_sel = OP1_SEL_REG;
+            exec_unit_params.operand2_sel = OP2_SEL_IMM;
         end
     endcase
-end
-
-// dmem_in_sel logic
-always @(*) begin
-    // does not have forwarding from M stage, and rs2_source[0] only changes
-    // to a 1 when it detects it needs to forward from W stage
-    dmem_in_sel = rs2_source[0];
 end
 
 endmodule

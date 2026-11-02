@@ -1,4 +1,7 @@
 import instructions_pkg::arch_reg;
+import mem_pkg::mem_params_t;
+import mem_pkg::MEM_ACCESS_WORD;
+import mem_pkg::MEM_OP_READ;
 
 `define NOP_INSTR 32'h00000013
 
@@ -13,6 +16,8 @@ module core
     input arch_reg setup_address,
     input arch_reg setup_data_in
 );
+// TODO: break this up into a component for each stage?
+// could clean up some of the temporary registers used within each stage
 /* Pipeline registers */
 arch_reg F_D_PC_out;
 arch_reg F_D_instr;
@@ -31,19 +36,31 @@ arch_reg X_M_dmem_in;
 arch_reg M_W_instr;
 arch_reg M_W_writeback_out;
 
+mem_params_t imem_params;
+assign imem_params.op = MEM_OP_READ;
+assign imem_params.access_size = MEM_ACCESS_WORD;
+assign imem_params.read_unsigned = 1;
+
+reg stall_F_D;
+reg pc_input_sel;
+
+reg_file_read_params_t reg_file_read;
+reg_file_write_params_t reg_file_write;
+
+branch_compare_params_t branch_compare_params;
+
 /* Fetch stage */
 arch_reg PC_out;
 arch_reg imem_out;
-
+arch_reg new_PC_in;
+arch_reg instr;
 mem imem(
     /* Inputs */
     .clock(clock),
     .reset(reset),
     .address(PC_out),
     .data_in(),
-    .read_write(1),
-    .access_size(MEM_ACCESS_WORD),
-    .unsigned_access(1),
+    .params(imem_params),
     /* Outputs */
     .data_out(imem_out),
     /* Setup stuff for tests */
@@ -52,10 +69,6 @@ mem imem(
     .setup_data_in(setup_data_in)
 );
 
-reg stall_F_D;
-reg pc_input_sel;
-reg[31:0] new_PC_in;
-reg[31:0] instr;
 fetch fetch_inst(
     /* Inputs */
     .clock(clock),
@@ -70,7 +83,7 @@ fetch fetch_inst(
 );
 
 reg flush_F_D;
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset || flush_F_D)
         F_D_instr <= `NOP_INSTR;
     else begin
@@ -82,7 +95,6 @@ always @(posedge clock) begin
 end
 
 /* Decode stage */
-reg[4:0] rs1_addr, rs2_addr;
 reg[2:0] imm_type;
 decode_D decode_D_inst(
     /* Inputs */
@@ -91,24 +103,20 @@ decode_D decode_D_inst(
     .M_stage_instr(X_M_instr),
     .W_stage_instr(M_W_instr),
     /* Outputs */
-    .rs1(rs1_addr),
-    .rs2(rs2_addr),
+    .rs1(reg_file_read.addr_rs1),
+    .rs2(reg_file_read.addr_rs2),
     .imm_type(imm_type),
     .stall_F_D(stall_F_D)
 );
 
-reg reg_file_WE;
-reg[4:0] rd_addr;
 reg[31:0] rd_in;
 reg[31:0] rs1_out, rs2_out;
 reg_file reg_file_inst(
     /* Inputs */
     .clock(clock),
-    .addr_rs1(rs1_addr),
-    .addr_rs2(rs2_addr),
-    .addr_rd(rd_addr), //decode, from writeback stage?
+    .read_params(reg_file_read),
+    .write_params(reg_file_write),
     .data_rd(rd_in), //decode, from writeback stage?
-    .write_enable(reg_file_WE), //decode, from writeback stage?
     /* Outputs */
     .data_rs1(rs1_out),
     .data_rs2(rs2_out),
@@ -124,7 +132,7 @@ imm_gen imm_gen_inst(
     .immediate_out(imm_out)
 );
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset || stall_F_D || flush_F_D)
         D_X_instr <= `NOP_INSTR;
     else begin
@@ -139,56 +147,51 @@ end
 /* Forwarding logic for rs1 and rs2 */
 reg[1:0] rs1_source, rs2_source;
 reg[31:0] rs1_forwarded, rs2_forwarded;
-always @(*) begin
-    if (rs1_source == 2'b10) begin
-        rs1_forwarded = X_M_exec_unit_out; /* Forward from the memory stage */
-    end else if (rs1_source == 2'b11) begin
-        rs1_forwarded = M_W_writeback_out; /* Forward from the writeback stage */
-    end else begin
-        rs1_forwarded = D_X_rs1;
-    end
+always_comb begin
+    case (rs1_source)
+        /* Forward from the memory stage */
+        2'b10: rs1_forwarded = X_M_exec_unit_out;
+        /* Forward from the writeback stage */
+        2'b11: rs1_forwarded = M_W_writeback_out;
+        default: rs1_forwarded = D_X_rs1;
+    endcase
 
-    if (rs2_source == 2'b10) begin
-        rs2_forwarded = X_M_exec_unit_out; /* Forward from the memory stage */
-    end else if (rs2_source == 2'b11) begin
-        rs2_forwarded = M_W_writeback_out; /* Forward from the writeback stage */
-    end else begin
-        rs2_forwarded = D_X_rs2;
-    end
+    case (rs2_source)
+        /* Forward from the memory stage */
+        2'b10: rs2_forwarded = X_M_exec_unit_out;
+        /* Forward from the writeback stage */
+        2'b11: rs2_forwarded = M_W_writeback_out;
+        default: rs2_forwarded = D_X_rs2;
+    endcase
 end
 
 /* Execute stage */
-reg branch_cmp_eq, branch_cmp_lt, branch_cmp_unsigned;
-reg[3:0] exec_op;
-reg operand1_sel, operand2_sel;
+pc_input_sel_t branch_result;
+exec_unit_params_t exec_unit_params;
 reg dmem_in_sel;
 decode_X decode_X_instr(
     /* Inputs */
     .instr(D_X_instr),
-    .branch_cmp_eq(branch_cmp_eq),
-    .branch_cmp_lt(branch_cmp_lt),
+    .branch_result(branch_result),
     .M_stage_instr(X_M_instr),
     .W_stage_instr(M_W_instr),
     /* Outputs */
-    .exec_op(exec_op),
     .rs1_source(rs1_source),
     .rs2_source(rs2_source),
-    .operand1_sel(operand1_sel),
-    .operand2_sel(operand2_sel),
+    .exec_unit_params(exec_unit_params),
     .dmem_in_sel(dmem_in_sel),
     .pc_input_sel(pc_input_sel),
     .flush_F_D(flush_F_D),
-    .branch_cmp_unsigned(branch_cmp_unsigned)
+    .branch_cmp_params(branch_compare_params)
 );
 
 branch_compare branch_compare_inst(
     /* Inputs */
     .rs1(rs1_forwarded),
     .rs2(rs2_forwarded),
-    .unsigned_cmp(branch_cmp_unsigned),
+    .params(branch_compare_params),
     /* Outputs */
-    .less_than(branch_cmp_lt),
-    .equal(branch_cmp_eq)
+    .branch_result(branch_result)
 );
 
 reg[31:0] exec_unit_out;
@@ -199,9 +202,7 @@ exec_unit exec_unit_inst(
     .rs1(rs1_forwarded),
     .rs2(rs2_forwarded),
     .imm_val(D_X_imm),
-    .operand1_sel(operand1_sel), //decode
-    .operand2_sel(operand2_sel), //decode
-    .exec_op(exec_op), //decode
+    .params(exec_unit_params),
 
     // outputs
     .exec_out(exec_unit_out)
@@ -210,14 +211,14 @@ exec_unit exec_unit_inst(
 // logic for bypassing W to X for data in,
 // useful in case of ALU-Store-Store case
 reg [31:0] dmem_in;
-always @(*) begin
-    case(dmem_in_sel)
+always_comb begin
+    unique case(dmem_in_sel)
         1'b0: dmem_in = D_X_rs2;
         1'b1: dmem_in = M_W_writeback_out;
     endcase
 end
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset)
         X_M_instr <= `NOP_INSTR;
     else begin
@@ -229,27 +230,23 @@ always @(posedge clock) begin
 end
 
 /* Memory stage */
-reg dmem_RW;
+mem_params_t dmem_params;
 reg dmem_write_sel;
-reg[1:0] dmem_access_size;
-reg dmem_load_unsigned;
 reg[1:0] write_back_sel;
 decode_M decode_M_inst(
     /* Inputs */
     .instr(X_M_instr),
     .W_stage_instr(M_W_instr),
     /* Outputs */
-    .mem_r_w(dmem_RW),
-    .mem_access_size(dmem_access_size),
-    .mem_load_unsigned(dmem_load_unsigned),
+    .dmem_params(dmem_params),
     .mem_write_sel(dmem_write_sel),
     .reg_store_sel(write_back_sel)
 );
 
 // data in selection from bypass or reg
 reg [31:0] dmem_data_in;
-always @(*) begin
-    case (dmem_write_sel)
+always_comb begin
+    unique case (dmem_write_sel)
         1'b0: dmem_data_in = X_M_dmem_in;
         1'b1: dmem_data_in = M_W_writeback_out;
     endcase
@@ -262,9 +259,7 @@ mem dmem(
     .reset(reset),
     .address(X_M_exec_unit_out),
     .data_in(dmem_data_in),
-    .read_write(dmem_RW),
-    .access_size(dmem_access_size),
-    .unsigned_access(dmem_load_unsigned),
+    .params(dmem_params),
     /* Outputs */
     .data_out(dmem_out),
     /* Setup stuff for tests */
@@ -288,7 +283,7 @@ write_back write_back_inst(
 // of it can be done from this higher level, and the module exsits to 
 // implement a mux to determine which value to write back
 
-always @(posedge clock) begin
+always_ff @(posedge clock) begin
     if (reset)
         M_W_instr <= `NOP_INSTR;
     else begin
@@ -302,8 +297,8 @@ decode_W decode_W_inst(
     /* Inputs */
     .instr(M_W_instr),
     /* Outputs */
-    .reg_write_en(reg_file_WE), /* Declared in Decode stage */
-    .rd(rd_addr) /* Declared in Decode stage */
+    .reg_write_en(reg_file_write.write_enable), /* Declared in Decode stage */
+    .rd(reg_file_write.addr_rd) /* Declared in Decode stage */
 );
 
 assign rd_in = M_W_writeback_out;
