@@ -8,6 +8,7 @@ FILE_LIST:=\
 	../common/exec_unit/exec_unit_pkg.sv \
 	../common/write_back/write_back_pkg.sv \
 	../common/csr/csr_pkg.sv \
+	io_pipelined_pkg.sv \
 	decode/decode_D.sv \
 	decode/decode_X.sv \
 	decode/decode_M.sv \

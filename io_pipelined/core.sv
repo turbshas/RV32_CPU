@@ -2,6 +2,10 @@ import instructions_pkg::arch_reg;
 import mem_pkg::mem_params_t;
 import mem_pkg::MEM_ACCESS_WORD;
 import mem_pkg::MEM_OP_READ;
+import io_pipelined_pkg::exec_reg_forward_t;
+import io_pipelined_pkg::FROM_MEM_STAGE;
+import io_pipelined_pkg::FROM_WB_STAGE;
+import imm_gen_pkg::imm_type_t;
 
 `define NOP_INSTR 32'h00000013
 
@@ -16,8 +20,6 @@ module core
     input arch_reg setup_address,
     input arch_reg setup_data_in
 );
-// TODO: break this up into a component for each stage?
-// could clean up some of the temporary registers used within each stage
 /* Pipeline registers */
 arch_reg F_D_PC_out;
 arch_reg F_D_instr;
@@ -41,8 +43,8 @@ assign imem_params.op = MEM_OP_READ;
 assign imem_params.access_size = MEM_ACCESS_WORD;
 assign imem_params.read_unsigned = 1;
 
-reg stall_F_D;
-reg pc_input_sel;
+logic stall_F_D;
+logic pc_input_sel;
 
 reg_file_read_params_t reg_file_read;
 reg_file_write_params_t reg_file_write;
@@ -82,7 +84,7 @@ fetch fetch_inst(
     .instr(instr)
 );
 
-reg flush_F_D;
+logic flush_F_D;
 always_ff @(posedge clock) begin
     if (reset || flush_F_D)
         F_D_instr <= `NOP_INSTR;
@@ -95,7 +97,7 @@ always_ff @(posedge clock) begin
 end
 
 /* Decode stage */
-reg[2:0] imm_type;
+imm_type_t imm_type;
 decode_D decode_D_inst(
     /* Inputs */
     .instr(F_D_instr),
@@ -108,8 +110,8 @@ decode_D decode_D_inst(
     .stall_F_D(stall_F_D)
 );
 
-reg[31:0] rd_in;
-reg[31:0] rs1_out, rs2_out;
+arch_reg rd_in;
+arch_reg rs1_out, rs2_out;
 reg_file reg_file_inst(
     /* Inputs */
     .clock(clock),
@@ -122,7 +124,7 @@ reg_file reg_file_inst(
     .registers_out(registers)
 );
 
-reg[31:0] imm_out;
+arch_reg imm_out;
 imm_gen imm_gen_inst(
     /* Inputs */
     .instr(F_D_instr[31:7]),
@@ -144,22 +146,22 @@ always_ff @(posedge clock) begin
 end
 
 /* Forwarding logic for rs1 and rs2 */
-reg[1:0] rs1_source, rs2_source;
-reg[31:0] rs1_forwarded, rs2_forwarded;
+exec_reg_forward_t rs1_source, rs2_source;
+arch_reg rs1_forwarded, rs2_forwarded;
 always_comb begin
     case (rs1_source)
         /* Forward from the memory stage */
-        2'b10: rs1_forwarded = X_M_exec_unit_out;
+        FROM_MEM_STAGE: rs1_forwarded = X_M_exec_unit_out;
         /* Forward from the writeback stage */
-        2'b11: rs1_forwarded = M_W_writeback_out;
+        FROM_WB_STAGE: rs1_forwarded = M_W_writeback_out;
         default: rs1_forwarded = D_X_rs1;
     endcase
 
     case (rs2_source)
         /* Forward from the memory stage */
-        2'b10: rs2_forwarded = X_M_exec_unit_out;
+        FROM_MEM_STAGE: rs2_forwarded = X_M_exec_unit_out;
         /* Forward from the writeback stage */
-        2'b11: rs2_forwarded = M_W_writeback_out;
+        FROM_WB_STAGE: rs2_forwarded = M_W_writeback_out;
         default: rs2_forwarded = D_X_rs2;
     endcase
 end
@@ -167,9 +169,10 @@ end
 /* Execute stage */
 pc_input_sel_t branch_result;
 exec_unit_params_t exec_unit_params;
-reg dmem_in_sel;
+logic dmem_in_sel;
 decode_X decode_X_instr(
     /* Inputs */
+    .reset(reset),
     .instr(D_X_instr),
     .branch_result(branch_result),
     .M_stage_instr(X_M_instr),
@@ -193,7 +196,7 @@ branch_compare branch_compare_inst(
     .branch_result(branch_result)
 );
 
-reg[31:0] exec_unit_out;
+arch_reg exec_unit_out;
 assign new_PC_in = exec_unit_out;
 exec_unit exec_unit_inst(
     // inputs
@@ -209,7 +212,7 @@ exec_unit exec_unit_inst(
 
 // logic for bypassing W to X for data in,
 // useful in case of ALU-Store-Store case
-reg [31:0] dmem_in;
+arch_reg dmem_in;
 always_comb begin
     unique case(dmem_in_sel)
         1'b0: dmem_in = D_X_rs2;
@@ -230,7 +233,7 @@ end
 
 /* Memory stage */
 mem_params_t dmem_params;
-reg dmem_write_sel;
+logic dmem_write_sel;
 reg[1:0] write_back_sel;
 decode_M decode_M_inst(
     /* Inputs */
@@ -243,7 +246,7 @@ decode_M decode_M_inst(
 );
 
 // data in selection from bypass or reg
-reg [31:0] dmem_data_in;
+arch_reg dmem_data_in;
 always_comb begin
     unique case (dmem_write_sel)
         1'b0: dmem_data_in = X_M_dmem_in;
@@ -251,7 +254,7 @@ always_comb begin
     endcase
 end
 
-reg[31:0] dmem_out;
+arch_reg dmem_out;
 mem dmem(
     /* Inputs */
     .clock(clock),
@@ -267,7 +270,7 @@ mem dmem(
     .setup_data_in(setup_data_in)
 );
 
-reg[31:0] write_back_out; // could change to rd_in directly
+arch_reg write_back_out; // could change to rd_in directly
 write_back write_back_inst(
     //inputs
     .mem_in(dmem_out),
