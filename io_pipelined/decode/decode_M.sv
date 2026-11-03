@@ -7,10 +7,6 @@ import mem_pkg::mem_access_size_t;
 import mem_pkg::MEM_ACCESS_BYTE;
 import mem_pkg::MEM_OP_READ;
 import mem_pkg::MEM_OP_WRITE;
-import write_back_pkg::write_back_select_t;
-import write_back_pkg::WRITE_BACK_SEL_ALU;
-import write_back_pkg::WRITE_BACK_SEL_MEM;
-import write_back_pkg::WRITE_BACK_SEL_PC;
 
 module decode_M
 (
@@ -18,8 +14,7 @@ module decode_M
     input instr_packet_t instr,
     input instr_packet_t W_stage_instr,
     output mem_params_t dmem_params,
-    output logic mem_write_sel,
-    output write_back_select_t reg_store_sel
+    output logic mem_write_sel
 );
 
 opcode_t opcode;
@@ -54,20 +49,6 @@ always_comb begin
         mem_write_sel = 1'b1; // use bypass
     else
         mem_write_sel = 1'b0; // use stage's register
-end
-
-// reg_store_sel, either takes ALU, MEM, or PC+4
-always_comb begin
-    case (opcode)
-        // Loads
-        OPCODE_LOAD: reg_store_sel = WRITE_BACK_SEL_MEM;
-
-        // JAL, JALR
-        OPCODE_JAL, OPCODE_JALR: reg_store_sel = WRITE_BACK_SEL_PC;
-
-        // All other ops modify registers in rd
-        default: reg_store_sel = WRITE_BACK_SEL_ALU;
-    endcase
 end
 
 endmodule

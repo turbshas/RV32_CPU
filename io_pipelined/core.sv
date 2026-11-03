@@ -37,7 +37,9 @@ arch_reg X_M_exec_unit_out;
 arch_reg X_M_dmem_in;
 
 arch_reg M_W_instr;
-arch_reg M_W_writeback_out;
+arch_reg M_W_dmem_out;
+arch_reg M_W_exec_unit_out;
+arch_reg M_W_PC_out;
 
 mem_params_t imem_params;
 assign imem_params.op = MEM_OP_READ;
@@ -154,7 +156,7 @@ always_comb begin
         /* Forward from the memory stage */
         FROM_MEM_STAGE: rs1_forwarded = X_M_exec_unit_out;
         /* Forward from the writeback stage */
-        FROM_WB_STAGE: rs1_forwarded = M_W_writeback_out;
+        FROM_WB_STAGE: rs1_forwarded = write_back_out;
         default: rs1_forwarded = D_X_rs1;
     endcase
 
@@ -162,7 +164,7 @@ always_comb begin
         /* Forward from the memory stage */
         FROM_MEM_STAGE: rs2_forwarded = X_M_exec_unit_out;
         /* Forward from the writeback stage */
-        FROM_WB_STAGE: rs2_forwarded = M_W_writeback_out;
+        FROM_WB_STAGE: rs2_forwarded = write_back_out;
         default: rs2_forwarded = D_X_rs2;
     endcase
 end
@@ -217,7 +219,7 @@ arch_reg dmem_in;
 always_comb begin
     unique case(dmem_in_sel)
         1'b0: dmem_in = D_X_rs2;
-        1'b1: dmem_in = M_W_writeback_out;
+        1'b1: dmem_in = write_back_out;
     endcase
 end
 
@@ -235,7 +237,6 @@ end
 /* Memory stage */
 mem_params_t dmem_params;
 logic dmem_write_sel;
-write_back_select_t write_back_sel;
 decode_M decode_M_inst(
     /* Inputs */
     .reset(reset),
@@ -243,8 +244,7 @@ decode_M decode_M_inst(
     .W_stage_instr(M_W_instr),
     /* Outputs */
     .dmem_params(dmem_params),
-    .mem_write_sel(dmem_write_sel),
-    .reg_store_sel(write_back_sel)
+    .mem_write_sel(dmem_write_sel)
 );
 
 // data in selection from bypass or reg
@@ -252,7 +252,7 @@ arch_reg dmem_data_in;
 always_comb begin
     unique case (dmem_write_sel)
         1'b0: dmem_data_in = X_M_dmem_in;
-        1'b1: dmem_data_in = M_W_writeback_out;
+        1'b1: dmem_data_in = write_back_out;
     endcase
 end
 
@@ -272,19 +272,8 @@ mem dmem(
     .setup_data_in(setup_data_in)
 );
 
-arch_reg write_back_out; // could change to rd_in directly
-write_back write_back_inst(
-    //inputs
-    .mem_in(dmem_out),
-    .alu_in(X_M_exec_unit_out),
-    .pc_in(X_M_PC_out),
-    .write_back_sel(write_back_sel),
-
-    // outputs
-    .write_back_out(write_back_out)
-);
 // The WB stage consists more of just connecting to reg file, so most
-// of it can be done from this higher level, and the module exsits to 
+// of it can be done from this higher level, and the module exists to
 // implement a mux to determine which value to write back
 
 always_ff @(posedge clock) begin
@@ -292,20 +281,36 @@ always_ff @(posedge clock) begin
         M_W_instr <= `NOP_INSTR;
     else begin
         M_W_instr <= X_M_instr;
-        M_W_writeback_out <= write_back_out;
+        M_W_dmem_out <= dmem_out;
+        M_W_exec_unit_out <= X_M_exec_unit_out;
+        M_W_PC_out <= X_M_PC_out;
     end
 end
 
 /* Writeback stage */
+write_back_select_t write_back_sel;
 decode_W decode_W_inst(
     /* Inputs */
+    .reset(reset),
     .instr(M_W_instr),
     /* Outputs */
-    .reg_write_en(reg_file_write.write_enable), /* Declared in Decode stage */
-    .rd(reg_file_write.addr_rd) /* Declared in Decode stage */
+    .reg_file_write_params(reg_file_write),
+    .reg_store_sel(write_back_sel)
 );
 
-assign rd_in = M_W_writeback_out;
+arch_reg write_back_out; // could change to rd_in directly
+write_back write_back_inst(
+    //inputs
+    .mem_in(M_W_dmem_out),
+    .alu_in(M_W_exec_unit_out),
+    .pc_in(M_W_PC_out),
+    .write_back_sel(write_back_sel),
+
+    // outputs
+    .write_back_out(write_back_out)
+);
+
+assign rd_in = write_back_out;
 
 assign instr_out = M_W_instr;
 endmodule
