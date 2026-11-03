@@ -6,6 +6,7 @@ import io_pipelined_pkg::exec_reg_forward_t;
 import io_pipelined_pkg::FROM_MEM_STAGE;
 import io_pipelined_pkg::FROM_WB_STAGE;
 import imm_gen_pkg::imm_type_t;
+import write_back_pkg::write_back_select_t;
 
 `define NOP_INSTR 32'h00000013
 
@@ -234,9 +235,10 @@ end
 /* Memory stage */
 mem_params_t dmem_params;
 logic dmem_write_sel;
-reg[1:0] write_back_sel;
+write_back_select_t write_back_sel;
 decode_M decode_M_inst(
     /* Inputs */
+    .reset(reset),
     .instr(X_M_instr),
     .W_stage_instr(M_W_instr),
     /* Outputs */
