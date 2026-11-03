@@ -1,60 +1,44 @@
+`include "constants.sv"
+import instructions_pkg::arch_reg_id;
 import instructions_pkg::arch_reg;
+import instructions_pkg::instr_packet_t;
+import instructions_pkg::opcode_t;
+import instructions_pkg::OPCODE_LUI;
+import instructions_pkg::OPCODE_BRANCH;
+import instructions_pkg::OPCODE_STORE;
+import instructions_pkg::OPCODE_LOAD;
+import instructions_pkg::OPCODE_OP;
 import imm_gen_pkg::imm_type_t;
-import imm_gen_pkg::IMM_I;
-import imm_gen_pkg::IMM_S;
-import imm_gen_pkg::IMM_B;
-import imm_gen_pkg::IMM_U;
-import imm_gen_pkg::IMM_J;
-import imm_gen_pkg::IMM_NONE;
 
 module decode_D
 (
-    input arch_reg instr,
-    input arch_reg X_stage_instr,
-    input arch_reg M_stage_instr,
-    input arch_reg W_stage_instr,
-    output logic[4:0] rs1,
-    output logic[4:0] rs2,
+    input instr_packet_t instr,
+    input instr_packet_t X_stage_instr,
+    input instr_packet_t M_stage_instr,
+    input instr_packet_t W_stage_instr,
+    output reg_file_read_params_t reg_file_read_params,
     output imm_type_t imm_type,
     output logic stall_F_D
 );
 
-// R-type values
-logic[4:0] opcode; // 2 lsb are always 11 for 32-bit instructions
+opcode_t opcode;
+funct3_t funct3;
+assign opcode = instr.opcode;
+assign funct3 = instr.params.r_instr.funct3;
 
-// always block for picking out pieces of the instruction
-always_comb begin
-    opcode = instr[6:2];
+decode_reg_file decode_reg_file(
+    .instr(instr),
+    .params(reg_file_read_params)
+);
 
-    case (opcode)
-        // LUI makes this need to be set to reg 0
-        5'b01101: rs1 = 5'b00000;
-        default: rs1 = instr[19:15];
-    endcase
+decode_imm_gen imm_gen_inst(
+    .opcode(opcode),
+    .funct3(funct3),
+    .imm_type(imm_type)
+);
 
-    rs2    = instr[24:20];
-end
-
-/* Reg/Immediate stage  */
-
-// always block for determining instruction type
-always_comb begin
-    case (opcode)
-        5'b11001: imm_type = IMM_I;
-        5'b00000: imm_type = IMM_I;
-        5'b00100: imm_type = IMM_I;
-        5'b01000: imm_type = IMM_S;
-        5'b11000: imm_type = IMM_B;
-        5'b01101: imm_type = IMM_U;
-        5'b00101: imm_type = IMM_U;
-        5'b11011: imm_type = IMM_J;
-        default: imm_type = IMM_NONE;
-    endcase
-end
-
-logic[4:0] X_opcode, X_rd;
-logic[4:0] M_opcode, M_rd;
-logic[4:0] W_opcode, W_rd;
+opcode_t X_opcode, M_opcode, W_opcode;
+arch_reg_id X_rd, M_rd, W_rd;
 logic X_op_has_dest, M_op_has_dest, W_op_has_dest;
 logic has_rs2;
 logic X_dest_required_rs1, X_dest_required_rs2;
@@ -64,40 +48,41 @@ logic W_bypass_available_rs1, W_bypass_available_rs2;
 logic load_use;
 // always block for determining whether to stall or not
 always_comb begin
-    X_opcode = X_stage_instr[6:2];
-    M_opcode = M_stage_instr[6:2];
-    W_opcode = W_stage_instr[6:2];
-    X_rd = X_stage_instr[11:7];
-    M_rd = M_stage_instr[11:7];
-    W_rd = W_stage_instr[11:7];
+    X_opcode = X_stage_instr.opcode;
+    M_opcode = M_stage_instr.opcode;
+    W_opcode = W_stage_instr.opcode;
+
+    X_rd = X_stage_instr.params.r_instr.rd;
+    M_rd = M_stage_instr.params.r_instr.rd;
+    W_rd = W_stage_instr.params.r_instr.rd;
 
     /* B-type and S-type have no destination. Also, ignore writes to x0 */
-    X_op_has_dest = (X_opcode != 5'b11000) && (X_opcode != 5'b01000) && (X_rd != 5'b00000);
-    M_op_has_dest = (M_opcode != 5'b11000) && (M_opcode != 5'b01000) && (M_rd != 5'b00000);
-    W_op_has_dest = (W_opcode != 5'b11000) && (W_opcode != 5'b01000) && (W_rd != 5'b00000);
+    X_op_has_dest = (X_opcode != OPCODE_BRANCH) && (X_opcode != OPCODE_STORE) && (X_rd != `REGISTER_X0);
+    M_op_has_dest = (M_opcode != OPCODE_BRANCH) && (M_opcode != OPCODE_STORE) && (M_rd != `REGISTER_X0);
+    W_op_has_dest = (W_opcode != OPCODE_BRANCH) && (W_opcode != OPCODE_STORE) && (W_rd != `REGISTER_X0);
 
     /* Need to skip stall checks for rs2 if the op doesn't have an rs2 */
     /* B-type, S-type, and R-type are the only ops with rs2 */
-    has_rs2 = (opcode == 5'b11000) || (opcode == 5'b01000) || (opcode == 5'b01100);
+    has_rs2 = (opcode == OPCODE_BRANCH) || (opcode == OPCODE_STORE) || (opcode == OPCODE_OP);
 
-    X_dest_required_rs1 = X_op_has_dest && (X_rd == rs1);
-    X_dest_required_rs2 = X_op_has_dest && (X_rd == rs2) && has_rs2;
+    X_dest_required_rs1 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs1);
+    X_dest_required_rs2 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs2) && has_rs2;
 
-    W_dest_required_rs1 = W_op_has_dest && (W_rd == rs1);
-    W_dest_required_rs2 = W_op_has_dest && (W_rd == rs2) && has_rs2;
+    W_dest_required_rs1 = W_op_has_dest && (W_rd == reg_file_read_params.addr_rs2);
+    W_dest_required_rs2 = W_op_has_dest && (W_rd == reg_file_read_params.addr_rs2) && has_rs2;
 
     /* Don't have to stall for W-D RAW hazards if there is a forwarding path */
     /*
     * In this case M/W-bypass available means there will be a
     * bypass when the current instruction gets to the X stage
     */
-    M_bypass_available_rs1 = X_op_has_dest && (X_rd == rs1);
-    M_bypass_available_rs2 = X_op_has_dest && (X_rd == rs2);
-    W_bypass_available_rs1 = M_op_has_dest && (M_rd == rs1);
-    W_bypass_available_rs2 = M_op_has_dest && (M_rd == rs2);
+    M_bypass_available_rs1 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs1);
+    M_bypass_available_rs2 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs2);
+    W_bypass_available_rs1 = M_op_has_dest && (M_rd == reg_file_read_params.addr_rs1);
+    W_bypass_available_rs2 = M_op_has_dest && (M_rd == reg_file_read_params.addr_rs2);
 
     /* Need to stall for load-use hazards */
-    load_use = (X_opcode == 5'b00000) && (X_dest_required_rs1 || X_dest_required_rs2);
+    load_use = (X_opcode == OPCODE_LOAD) && (X_dest_required_rs1 || X_dest_required_rs2);
 
     stall_F_D =
         (W_dest_required_rs1 && !(M_bypass_available_rs1 || W_bypass_available_rs1))

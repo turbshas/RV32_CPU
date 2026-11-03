@@ -7,6 +7,7 @@ FILE_LIST:=\
 	../common/branch_compare/branch_compare_pkg.sv \
 	../common/exec_unit/exec_unit_pkg.sv \
 	../common/write_back/write_back_pkg.sv \
+	../common/csr/csr_pkg.sv \
 	decode/decode_D.sv \
 	decode/decode_X.sv \
 	decode/decode_M.sv \
@@ -18,6 +19,14 @@ FILE_LIST:=\
 	../common/branch_compare/branch_compare.sv \
 	../common/exec_unit/exec_unit.sv \
 	../common/write_back/write_back.sv \
+	../common/decode/decode_branch_compare.sv \
+	../common/decode/decode_csr.sv \
+	../common/decode/decode_exec_unit.sv \
+	../common/decode/decode_imm_gen.sv \
+	../common/decode/decode_mem.sv \
+	../common/decode/decode_pc_input_select.sv \
+	../common/decode/decode_reg_file.sv \
+	../common/decode/decode_write_back.sv \
 	core.sv
 
 INCLUDE_DIRS:=\

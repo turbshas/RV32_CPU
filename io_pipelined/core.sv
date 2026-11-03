@@ -103,8 +103,7 @@ decode_D decode_D_inst(
     .M_stage_instr(X_M_instr),
     .W_stage_instr(M_W_instr),
     /* Outputs */
-    .rs1(reg_file_read.addr_rs1),
-    .rs2(reg_file_read.addr_rs2),
+    .reg_file_read_params(reg_file_read),
     .imm_type(imm_type),
     .stall_F_D(stall_F_D)
 );

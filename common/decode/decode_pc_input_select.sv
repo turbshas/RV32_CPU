@@ -14,7 +14,6 @@ module decode_pc_input_select
     output pc_input_sel_t pc_input_sel
 );
 
-// pc_input_sel
 always_comb begin
     // either takes PC+4 or ALU when branch false or true respectively, on
     // a B instruction
