@@ -1,5 +1,6 @@
 module stage_D
 (
+    input logic clock,
     input instr_packet_t F_D_instr,
     input instr_packet_t D_X_instr,
     input instr_packet_t X_M_instr,
@@ -9,11 +10,13 @@ module stage_D
     output arch_reg rs1_out,
     output arch_reg rs2_out,
     output arch_reg imm_out,
+    output logic stall_F_D,
 
     output arch_reg registers[32]
 );
 
 imm_type_t imm_type;
+reg_file_read_params_t reg_file_read;
 
 decode_D decode_D_inst(
     /* Inputs */

@@ -52,7 +52,6 @@ arch_reg M_W_PC_out;
 logic stall_F_D;
 logic pc_input_sel;
 
-reg_file_read_params_t reg_file_read;
 reg_file_write_params_t reg_file_write;
 
 branch_compare_params_t branch_compare_params;
@@ -96,6 +95,7 @@ arch_reg rs2_out;
 arch_reg imm_out;
 
 stage_D stage_D_inst(
+    .clock(clock),
     .F_D_instr(F_D_instr),
     .D_X_instr(D_X_instr),
     .X_M_instr(X_M_instr),
@@ -105,6 +105,7 @@ stage_D stage_D_inst(
     .rs1_out(rs1_out),
     .rs2_out(rs2_out),
     .imm_out(imm_out),
+    .stall_F_D(stall_F_D),
 
     .registers(registers)
 );
