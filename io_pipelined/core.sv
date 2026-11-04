@@ -49,11 +49,6 @@ arch_reg M_W_dmem_out;
 arch_reg M_W_exec_unit_out;
 arch_reg M_W_PC_out;
 
-mem_params_t imem_params;
-assign imem_params.op = MEM_OP_READ;
-assign imem_params.access_size = MEM_ACCESS_WORD;
-assign imem_params.read_unsigned = 1;
-
 logic stall_F_D;
 logic pc_input_sel;
 
@@ -67,32 +62,19 @@ arch_reg PC_out;
 arch_reg imem_out;
 arch_reg new_PC_in;
 arch_reg instr;
-mem imem(
-    /* Inputs */
+stage_F stage_F_inst(
     .clock(clock),
     .reset(reset),
-    .address(PC_out),
-    .data_in(),
-    .params(imem_params),
-    /* Outputs */
-    .data_out(imem_out),
-    /* Setup stuff for tests */
-    .setup_write(setup_write),
-    .setup_address(setup_address),
-    .setup_data_in(setup_data_in)
-);
-
-fetch fetch_inst(
-    /* Inputs */
-    .clock(clock),
-    .reset(reset),
-    .data_in(imem_out),
-    .set_PC(pc_input_sel),
-    .new_PC(new_PC_in),
-    .stall_PC(stall_F_D),
-    /* Outputs */
+    .pc_input_sel(pc_input_sel),
+    .new_PC_in(new_PC_in),
+    .stall_F_D(stall_F_D),
     .PC_out(PC_out),
-    .instr(instr)
+    .imem_out(imem_out),
+    .instr(instr),
+
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in),
+    .setup_write(setup_write)
 );
 
 logic flush_F_D;
@@ -108,40 +90,23 @@ always_ff @(posedge clock) begin
 end
 
 /* Decode stage */
-imm_type_t imm_type;
-decode_D decode_D_inst(
-    /* Inputs */
-    .instr(F_D_instr),
-    .X_stage_instr(D_X_instr),
-    .M_stage_instr(X_M_instr),
-    .W_stage_instr(M_W_instr),
-    /* Outputs */
-    .reg_file_read_params(reg_file_read),
-    .imm_type(imm_type),
-    .stall_F_D(stall_F_D)
-);
-
 arch_reg rd_in;
-arch_reg rs1_out, rs2_out;
-reg_file reg_file_inst(
-    /* Inputs */
-    .clock(clock),
-    .read_params(reg_file_read),
-    .write_params(reg_file_write),
-    .data_rd(rd_in), //decode, from writeback stage?
-    /* Outputs */
-    .data_rs1(rs1_out),
-    .data_rs2(rs2_out),
-    .registers_out(registers)
-);
-
+arch_reg rs1_out;
+arch_reg rs2_out;
 arch_reg imm_out;
-imm_gen imm_gen_inst(
-    /* Inputs */
-    .instr(F_D_instr[31:7]),
-    .imm_type(imm_type),
-    /* Outputs */
-    .immediate_out(imm_out)
+
+stage_D stage_D_inst(
+    .F_D_instr(F_D_instr),
+    .D_X_instr(D_X_instr),
+    .X_M_instr(X_M_instr),
+    .M_W_instr(M_W_instr),
+    .rd_in(rd_in),
+    .reg_file_write(reg_file_write),
+    .rs1_out(rs1_out),
+    .rs2_out(rs2_out),
+    .imm_out(imm_out),
+
+    .registers(registers)
 );
 
 always_ff @(posedge clock) begin

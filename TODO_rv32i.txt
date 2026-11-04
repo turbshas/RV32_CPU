@@ -1,6 +1,4 @@
 REWORK:
-- decode has been split into common components
-- in-order needs to use these common components instead, in each of the M/X/W stages
 - in-order should be split up into stages, each stage combines main path and decode logic, core combines + adds registers
 - in-order needs to have data types used cleaned up - should use logic everywhere + enums + structures
 

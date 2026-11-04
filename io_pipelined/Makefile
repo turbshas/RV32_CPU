@@ -13,6 +13,11 @@ FILE_LIST:=\
 	decode/decode_X.sv \
 	decode/decode_M.sv \
 	decode/decode_W.sv \
+	stage/stage_F.sv \
+	stage/stage_D.sv \
+	stage/stage_X.sv \
+	stage/stage_M.sv \
+	stage/stage_W.sv \
 	../common/mem/mem.sv \
 	../common/fetch/fetch.sv \
 	../common/imm_gen/imm_gen.sv \
