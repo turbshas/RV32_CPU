@@ -40,6 +40,7 @@ double sc_time_stamp(void) {
     return main_time;
 }
 
+static const char fmt_short[] = "PC: 0x%08x | W: 0x%08x | rd: %02u | rd_val: 0x%08x | rd_write: %u | sp: 0x%08x\n";
 static const char fmt[] = "\
 0x%08x, 0x%08x, 0x%08x, 0x%08x, \n\
 0x%08x, 0x%08x, 0x%08x, 0x%08x, \n\
@@ -131,12 +132,13 @@ int main(int argc, char *argv[]) {
             dut->registers[30], dut->registers[31]);
 
     unsigned call_stack = 1;
-    while ((dut->instr_out != ECALL_INSTR) && (call_stack != 0)) {
-        if (IS_FN_CALL(dut->instr_out)) {
+    while ((dut->instr_out_W != ECALL_INSTR) && (call_stack != 0)) {
+        if (IS_FN_CALL(dut->instr_out_W)) {
             call_stack++;
-        } else if (IS_FN_RET(dut->instr_out)) {
+        } else if (IS_FN_RET(dut->instr_out_W)) {
             call_stack--;
         }
+        // printf(fmt_short, dut->pc, dut->instr_out_W, dut->rd_addr, dut->rd, dut->rd_write, dut->registers[2]);
         INCREMENT_CLOCK(5);
         INCREMENT_CLOCK(5);
     }

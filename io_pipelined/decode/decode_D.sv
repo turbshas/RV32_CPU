@@ -68,7 +68,7 @@ always_comb begin
     X_dest_required_rs1 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs1);
     X_dest_required_rs2 = X_op_has_dest && (X_rd == reg_file_read_params.addr_rs2) && has_rs2;
 
-    W_dest_required_rs1 = W_op_has_dest && (W_rd == reg_file_read_params.addr_rs2);
+    W_dest_required_rs1 = W_op_has_dest && (W_rd == reg_file_read_params.addr_rs1);
     W_dest_required_rs2 = W_op_has_dest && (W_rd == reg_file_read_params.addr_rs2) && has_rs2;
 
     /* Don't have to stall for W-D RAW hazards if there is a forwarding path */

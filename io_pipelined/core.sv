@@ -14,8 +14,16 @@ module core
 (
     input wire clock,
     input wire reset,
-    output arch_reg instr_out,
+    output arch_reg instr_out_F,
+    output arch_reg instr_out_D,
+    output arch_reg instr_out_X,
+    output arch_reg instr_out_M,
+    output arch_reg instr_out_W,
+    output arch_reg pc,
     output arch_reg registers[32],
+    output arch_reg rd,
+    output arch_reg_id rd_addr,
+    output logic rd_write,
 
     input wire setup_write,
     input arch_reg setup_address,
@@ -312,6 +320,14 @@ write_back write_back_inst(
 
 assign rd_in = write_back_out;
 
-assign instr_out = M_W_instr;
+assign instr_out_F = instr;
+assign instr_out_D = F_D_instr;
+assign instr_out_X = D_X_instr;
+assign instr_out_M = X_M_instr;
+assign instr_out_W = M_W_instr;
+assign pc = M_W_PC_out;
+assign rd = write_back_out;
+assign rd_addr = reg_file_write.addr_rd;
+assign rd_write = reg_file_write.write_enable;
 endmodule
 

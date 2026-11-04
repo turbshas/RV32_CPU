@@ -78,8 +78,9 @@ test_instr: $(INSTR_TESTS_OUT)
 test_simple: $(SIMPLE_PROGRAMS_OUT)
 
 # Targets for viewing RTL of the code
+# TODO: requires conversion from SystemVerilog to Verilog. See https://github.com/zachjs/sv2v
 $(OUTPUT_NAME).json: $(FILE_LIST)
-	yosys -p "read_verilog $(INCLUDE_DIRS) -DBUILDING_RTL $< ; prep -top $(TOPMODULE) -flatten; write_json $@" 1>/dev/null
+	yosys -p "read_verilog $(INCLUDE_DIRS) -DBUILDING_RTL $(FILE_LIST) ; prep -top $(TOPMODULE) -flatten; write_json $@" 1>/dev/null
 
 $(OUTPUT_NAME).svg: $(OUTPUT_NAME).json
 	netlistsvg $< -o $@

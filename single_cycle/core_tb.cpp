@@ -40,7 +40,7 @@ double sc_time_stamp(void) {
     return main_time;
 }
 
-//static const char fmt[] = "PC: 0x%08x | instr: 0x%08x\n";
+static const char fmt_short[] = "PC: 0x%08x | instr: 0x%08x\n";
 static const char fmt[] = "\
 0x%08x, 0x%08x, 0x%08x, 0x%08x, \n\
 0x%08x, 0x%08x, 0x%08x, 0x%08x, \n\
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
         } else if (IS_FN_RET(dut->instr_out)) {
             call_stack--;
         }
-        //printf(fmt, dut->pc_out, dut->instr_out);
+        printf(fmt_short, dut->pc_out, dut->instr_out, dut->instr_out & OPCODE);
         INCREMENT_CLOCK(5);
         INCREMENT_CLOCK(5);
     }

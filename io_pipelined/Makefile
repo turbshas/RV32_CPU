@@ -33,15 +33,6 @@ FILE_LIST:=\
 INCLUDE_DIRS:=\
 	-I. \
 	-I../common/ \
-	-I../common/mem \
-	-I../common/fence \
-	-I../common/fetch \
-	-I../common/decode \
-	-I../common/imm_gen \
-	-I../common/reg_file \
-	-I../common/branch_compare \
-	-I../common/exec_unit \
-	-I../common/write_back
 
 OUTPUT_NAME:=core
 TOPMODULE:=core
