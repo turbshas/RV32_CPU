@@ -54,8 +54,6 @@ logic pc_input_sel;
 
 reg_file_write_params_t reg_file_write;
 
-branch_compare_params_t branch_compare_params;
-
 /* Fetch stage */
 arch_reg PC_out;
 arch_reg imem_out;
@@ -122,80 +120,28 @@ always_ff @(posedge clock) begin
     end
 end
 
-/* Forwarding logic for rs1 and rs2 */
-exec_reg_forward_t rs1_source, rs2_source;
-arch_reg rs1_forwarded, rs2_forwarded;
-always_comb begin
-    case (rs1_source)
-        /* Forward from the memory stage */
-        FROM_MEM_STAGE: rs1_forwarded = X_M_exec_unit_out;
-        /* Forward from the writeback stage */
-        FROM_WB_STAGE: rs1_forwarded = write_back_out;
-        default: rs1_forwarded = D_X_rs1;
-    endcase
-
-    case (rs2_source)
-        /* Forward from the memory stage */
-        FROM_MEM_STAGE: rs2_forwarded = X_M_exec_unit_out;
-        /* Forward from the writeback stage */
-        FROM_WB_STAGE: rs2_forwarded = write_back_out;
-        default: rs2_forwarded = D_X_rs2;
-    endcase
-end
-
 /* Execute stage */
-pc_input_sel_t branch_result;
-exec_unit_params_t exec_unit_params;
-logic dmem_in_sel;
-decode_X decode_X_instr(
-    /* Inputs */
-    .reset(reset),
-    .instr(D_X_instr),
-    .branch_result(branch_result),
-    .M_stage_instr(X_M_instr),
-    .W_stage_instr(M_W_instr),
-    /* Outputs */
-    .rs1_source(rs1_source),
-    .rs2_source(rs2_source),
-    .exec_unit_params(exec_unit_params),
-    .dmem_in_sel(dmem_in_sel),
-    .pc_input_sel(pc_input_sel),
-    .flush_F_D(flush_F_D),
-    .branch_cmp_params(branch_compare_params)
-);
-
-branch_compare branch_compare_inst(
-    /* Inputs */
-    .rs1(rs1_forwarded),
-    .rs2(rs2_forwarded),
-    .params(branch_compare_params),
-    /* Outputs */
-    .branch_result(branch_result)
-);
-
+arch_reg dmem_in;
 arch_reg exec_unit_out;
 assign new_PC_in = exec_unit_out;
-exec_unit exec_unit_inst(
-    // inputs
-    .pc(D_X_PC_out),
-    .rs1(rs1_forwarded),
-    .rs2(rs2_forwarded),
-    .imm_val(D_X_imm),
-    .params(exec_unit_params),
 
-    // outputs
-    .exec_out(exec_unit_out)
+stage_X stage_X_inst(
+    .reset(reset),
+    .D_X_PC_out(D_X_PC_out),
+    .D_X_instr(D_X_instr),
+    .X_M_instr(X_M_instr),
+    .M_W_instr(M_W_instr),
+    .X_M_exec_unit_out(X_M_exec_unit_out),
+    .write_back_out(write_back_out),
+    .D_X_rs1(D_X_rs1),
+    .D_X_rs2(D_X_rs2),
+    .D_X_imm(D_X_imm),
+
+    .pc_input_sel(pc_input_sel),
+    .flush_F_D(flush_F_D),
+    .exec_unit_out(exec_unit_out),
+    .dmem_in(dmem_in)
 );
-
-// logic for bypassing W to X for data in,
-// useful in case of ALU-Store-Store case
-arch_reg dmem_in;
-always_comb begin
-    unique case(dmem_in_sel)
-        1'b0: dmem_in = D_X_rs2;
-        1'b1: dmem_in = write_back_out;
-    endcase
-end
 
 always_ff @(posedge clock) begin
     if (reset)
@@ -209,46 +155,23 @@ always_ff @(posedge clock) begin
 end
 
 /* Memory stage */
-mem_params_t dmem_params;
-logic dmem_write_sel;
-decode_M decode_M_inst(
-    /* Inputs */
-    .reset(reset),
-    .instr(X_M_instr),
-    .W_stage_instr(M_W_instr),
-    /* Outputs */
-    .dmem_params(dmem_params),
-    .mem_write_sel(dmem_write_sel)
-);
-
-// data in selection from bypass or reg
-arch_reg dmem_data_in;
-always_comb begin
-    unique case (dmem_write_sel)
-        1'b0: dmem_data_in = X_M_dmem_in;
-        1'b1: dmem_data_in = write_back_out;
-    endcase
-end
-
 arch_reg dmem_out;
-mem dmem(
-    /* Inputs */
+stage_M stage_M_inst(
     .clock(clock),
     .reset(reset),
-    .address(X_M_exec_unit_out),
-    .data_in(dmem_data_in),
-    .params(dmem_params),
-    /* Outputs */
-    .data_out(dmem_out),
-    /* Setup stuff for tests */
-    .setup_write(setup_write),
-    .setup_address(setup_address),
-    .setup_data_in(setup_data_in)
-);
+    .X_M_instr(X_M_instr),
+    .M_W_instr(M_W_instr),
+    .X_M_exec_unit_out(X_M_exec_unit_out),
+    .X_M_dmem_in(X_M_dmem_in),
+    .write_back_out(write_back_out),
 
-// The WB stage consists more of just connecting to reg file, so most
-// of it can be done from this higher level, and the module exists to
-// implement a mux to determine which value to write back
+    .dmem_out(dmem_out),
+
+    // Test stuff
+    .setup_address(setup_address),
+    .setup_data_in(setup_data_in),
+    .setup_write(setup_write)
+);
 
 always_ff @(posedge clock) begin
     if (reset)
@@ -262,25 +185,14 @@ always_ff @(posedge clock) begin
 end
 
 /* Writeback stage */
-write_back_select_t write_back_sel;
-decode_W decode_W_inst(
-    /* Inputs */
-    .reset(reset),
-    .instr(M_W_instr),
-    /* Outputs */
-    .reg_file_write_params(reg_file_write),
-    .reg_store_sel(write_back_sel)
-);
-
 arch_reg write_back_out; // could change to rd_in directly
-write_back write_back_inst(
-    //inputs
-    .mem_in(M_W_dmem_out),
-    .alu_in(M_W_exec_unit_out),
-    .pc_in(M_W_PC_out),
-    .write_back_sel(write_back_sel),
-
-    // outputs
+stage_W stage_W_inst(
+    .reset(reset),
+    .M_W_instr(M_W_instr),
+    .M_W_dmem_out(M_W_dmem_out),
+    .M_W_exec_unit_out(M_W_exec_unit_out),
+    .M_W_PC_out(M_W_PC_out),
+    .reg_file_write(reg_file_write),
     .write_back_out(write_back_out)
 );
 
