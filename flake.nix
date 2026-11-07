@@ -17,6 +17,7 @@
                 yosys
                 gtkwave
                 netlistsvg
+                haskellPackages.sv2v
             ];
         };
     };

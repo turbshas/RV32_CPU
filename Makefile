@@ -63,6 +63,11 @@ SIMPLE_PROGRAMS_OUT := $(patsubst $(TEST_DIR)/%.x, test_output/%.out, $(SIMPLE_P
 INSTR_TESTS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(INSTR_TEST_FILES))
 SIMPLE_PROGRAMS_VCD := $(patsubst $(TEST_DIR)/%.x, vcd_output/%.vcd, $(SIMPLE_PROGRAM_FILES))
 
+# Yosys doesn't support SystemVerilog.
+# TODO: Need to convert file paths - want absolute paths? and destination folder, so remove pieces of the path to make them relative
+# - FILE_LIST contains all relative paths including ".." which complicates things
+# FILES_CONVERTED_LIST := $(patsubst %.sv, %.v, $(FILE_LIST))
+
 test_output/%.out: $(TEST_DIR)/%.x obj_dir/$(VERILATOR_NAME)
 	@mkdir -p $(dir $@)
 	obj_dir/$(VERILATOR_NAME) "$<" "vcd_output/$*.vcd" > "test_output/$*.out"
